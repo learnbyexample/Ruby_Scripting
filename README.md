@@ -13,6 +13,8 @@
 
 :warning: :construction: Work in progress, stay tuned...
 
+* [Exercises](./Exercises.md)
+
 <br>
 
 ## <a name="contributing"></a>Contributing
