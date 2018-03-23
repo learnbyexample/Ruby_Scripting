@@ -13,7 +13,7 @@
 
 :warning: :construction: Work in progress, stay tuned...
 
-* [Exercises](./Exercises.md)
+* [Exercises](./chapters/Exercises.md)
 
 <br>
 
