@@ -3,10 +3,15 @@
 1) [Variables and Print](#variables-and-print)
 2) [Functions](#functions)
 3) [Control structures](#control-structures)
+4) [List](#list)
+5) [File](#file)
+6) [Text processing](#text-processing)
 
 <br>
 
-For some questions, Ruby program with `raise` statements is provided to automatically test your solution in the [exercise_files](https://github.com/learnbyexample/Ruby_Scripting/tree/master/exercise_files) directory
+* For some questions, Ruby program with `raise` statements is provided to automatically test your solution in the [exercise_files](https://github.com/learnbyexample/Ruby_Scripting/tree/master/exercise_files) directory
+* You can also solve these exercises on [repl.it](https://repl.it/community/classrooms/53963), with an option to submit them for review
+    * or use [gitter group chat](https://gitter.im/learnbyexample/scripting_course) for discussion
 
 <br>
 
@@ -173,6 +178,164 @@ irb(main):001:0> num_palindrome(6, 20)
 => [[["7", "111"], ["9", "1001"]], [["7", "111", "7"], ["9", "1001", "11"]]]
 irb(main):002:0> num_palindrome(300, 600)
 => [[["313", "100111001"], ["585", "1001001001"]], [["585", "1001001001", "1111"]]]
+```
+
+<br>
+
+## <a name="list"></a>4) List
+
+**Q4a)** Write a function that returns product of all numbers of a list/range
+
+```ruby
+irb(main):001:0> product([1, 4, 21])
+=> 84
+irb(main):002:0> product([-4, 2.3e12, 77.23, 982, 0b101])
+=> -3.48863356e+18
+irb(main):003:0> product([-3, 11, 2])
+=> -66
+irb(main):004:0> product([8, 300])
+=> 2400
+irb(main):005:0> product([234, 121, 23, 945, 0])
+=> 0
+irb(main):006:0> product(1..5)
+=> 120
+```
+
+**Q4b)** Write a function that returns nth lowest of a list/string. Return the lowest if second argument is not specified
+
+*Note* that duplicates shouldn't affect determining nth lowest
+
+```ruby
+irb(main):001:0> nums = [42, 23421341, 234.2e3, 21, 232, 12312, -2343]
+=> [42, 23421341, 234200.0, 21, 232, 12312, -2343]
+irb(main):002:0> nth_lowest(nums, 3)
+=> 42
+irb(main):003:0> nth_lowest(nums, 5)
+=> 12312
+
+irb(main):004:0> nums = [1, -2, 4, 2, 1, 3, 3, 5]
+=> [1, -2, 4, 2, 1, 3, 3, 5]
+irb(main):005:0> nth_lowest(nums)
+=> -2
+irb(main):006:0> nth_lowest(nums, 4)
+=> 3
+
+irb(main):007:0> nth_lowest('unrecognizable', 3)
+=> "c"
+irb(main):008:0> nth_lowest('jump', 2)
+=> "m"
+irb(main):009:0> nth_lowest('abracadabra', 5)
+=> "r"
+```
+
+<br>
+
+## <a name="file"></a>5) File
+
+**Q5a)** Print sum of all numbers from a file containing only single column numbers (integer or float)
+
+```
+$ cat f1.txt 
+8
+53
+3.14
+84
+73e2
+100
+2937
+
+$ ./col_sum.rb 
+10485.14
+```
+
+**Q5b)** Print sum of all numbers (assume only positive integer numbers) from a file containing arbitrary string
+
+```
+$ cat f2.txt 
+Hello123 World 35
+341 2
+Good 13day
+How are 1784 you
+
+$ ./extract_sum.rb 
+2298
+```
+
+<br>
+
+## <a name="text-processing"></a>6) Text processing
+
+**Q6a)** Check if two words are same or differ by only one character (irrespective of case), input strings should have same length
+
+See also [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance)
+
+```ruby
+irb(main):001:0> is_one_char_diff('bar', 'bar')
+=> true
+irb(main):002:0> is_one_char_diff('bar', 'Baz')
+=> true
+irb(main):003:0> is_one_char_diff('Food', 'fold')
+=> true
+irb(main):004:0> is_one_char_diff('A', 'b')
+=> true
+
+irb(main):005:0> is_one_char_diff('a', '')
+=> false
+irb(main):006:0> is_one_char_diff('Bar', 'Bark')
+=> false
+irb(main):007:0> is_one_char_diff('Bar', 'art')
+=> false
+irb(main):008:0> is_one_char_diff('Food', 'fled')
+=> false
+irb(main):009:0> is_one_char_diff('ab', '')
+=> false
+```
+
+**Q6b)** Check if each word of a sentence(separated by whitespace) is in ascending/descending alphabetic order or not (irrespective of case)
+
+```ruby
+irb(main):001:0> is_alpha_order('bot')
+=> true
+irb(main):002:0> is_alpha_order('AborT')
+=> true
+irb(main):003:0> is_alpha_order('toe')
+=> true
+
+irb(main):004:0> is_alpha_order('are')
+=> false
+irb(main):005:0> is_alpha_order('Flee')
+=> false
+
+irb(main):006:0> is_alpha_order('Toe got bit')
+=> true
+irb(main):007:0> is_alpha_order('All is well')
+=> false
+irb(main):008:0> is_alpha_order('Food is good')
+=> false
+```
+
+**Q6c)** Find the maximum nested depth of curly braces
+
+Unbalanced, empty or wrongly ordered braces should return `-1`
+
+Hint: Iterate over string characters or use regular expressions
+
+```ruby
+irb(main):001:0> max_nested_braces('a*b')
+=> 0
+irb(main):002:0> max_nested_braces('{a+2}*{b+c}')
+=> 1
+irb(main):003:0> max_nested_braces('{{a+2}*{{b+{c*d}}+e*d}}')
+=> 4
+irb(main):007:0> max_nested_braces('{{a+2}*{b+{c*d}}+e}')
+=> 3
+
+irb(main):004:0> max_nested_braces('a*b+{}')
+=> -1
+irb(main):005:0> max_nested_braces('}a+b{')
+=> -1
+irb(main):006:0> max_nested_braces('a*b{')
+=> -1
 ```
 
 
