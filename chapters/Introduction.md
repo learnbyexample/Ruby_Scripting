@@ -93,7 +93,20 @@ irb(main):006:0> 12 + _
 irb(main):007:0> exit
 ```
 
+* `irb` can be customized in many ways, see document link for details
+* in coming chapters, `irb --simple-prompt` will be used for simplicity
+
+```ruby
+$ alias irb='irb --simple-prompt'
+
+$ irb
+>> 34 + 3.14
+=> 37.14
+>> exit
+```
+
 **Further Reading**
 
 * [ruby-doc: interactive Ruby](https://ruby-doc.org/stdlib-2.5.0/libdoc/irb/rdoc/IRB.html)
+* [pry](https://github.com/pry/pry)
 
