@@ -13,11 +13,13 @@
 
 :warning: :construction: Work in progress, stay tuned...
 
+* [Introduction](./chapters/Introduction.md)
+* [Numbers and Strings](./chapters/Numbers_and_Strings.md)
 * [Exercises](./chapters/Exercises.md)
 
 <br>
 
-## <a name="contributing"></a>Contributing
+# <a name="contributing"></a>Contributing
 
 * Please open an issue for typos/bugs/suggestions/etc
     * Even for pull requests, open an issue for discussion before submitting PRs
