@@ -6,6 +6,7 @@
 4) [List](#list)
 5) [File](#file)
 6) [Text processing](#text-processing)
+7) [Misc](#misc)
 
 <br>
 
@@ -41,11 +42,11 @@ College    : PSG Tech
 **Q2a)** Write a function to return length of integer numbers
 
 ```ruby
-irb(main):001:0> len_int(962306349871524124750813401378124)
+>> len_int(962306349871524124750813401378124)
 => 33
-irb(main):002:0> len_int(+42)
+>> len_int(+42)
 => 2
-irb(main):003:0> len_int(-42)
+>> len_int(-42)
 => 2
 
 # len_int('a') should give
@@ -55,28 +56,28 @@ TypeError (provide only integer input)
 **Q2b)** Compare if two strings are same irrespective of case
 
 ```ruby
-irb(main):001:0> str_cmp('nice', 'nice')
+>> str_cmp('nice', 'nice')
 => true
-irb(main):002:0> str_cmp('how', 'who')
+>> str_cmp('how', 'who')
 => false
-irb(main):003:0> str_cmp('GoOd DaY', 'gOOd dAy')
+>> str_cmp('GoOd DaY', 'gOOd dAy')
 => true
-irb(main):004:0> str_cmp('foo', 'food')
+>> str_cmp('foo', 'food')
 => false
 ```
 
 **Q2c)** Compare if two strings are anagrams (assume input consists of ASCII alphabets only)
 
 ```ruby
-irb(main):001:0> str_anagram('god', 'Dog')
+>> str_anagram('god', 'Dog')
 => true
-irb(main):002:0> str_anagram('beat', 'table')
+>> str_anagram('beat', 'table')
 => false
-irb(main):003:0> str_anagram('Tap', 'paT')
+>> str_anagram('Tap', 'paT')
 => true
-irb(main):004:0> str_anagram('beat', 'abet')
+>> str_anagram('beat', 'abet')
 => true
-irb(main):005:0> str_anagram('seat', 'teal')
+>> str_anagram('seat', 'teal')
 => false
 ```
 
@@ -84,28 +85,28 @@ irb(main):005:0> str_anagram('seat', 'teal')
 
 ```ruby
 # number input
-irb(main):001:0> num(3)
+>> num(3)
 => 3
-irb(main):002:0> num(0x1f)
+>> num(0x1f)
 => 31
-irb(main):003:0> num(3.32)
+>> num(3.32)
 => 3.32
 
 # string input
-irb(main):004:0> num('123')
+>> num('123')
 => 123
-irb(main):005:0> num('-78')
+>> num('-78')
 => -78
-irb(main):006:0> num(" 42  \n ")
+>> num(" 42  \n ")
 => 42
-irb(main):007:0> num('3.14')
+>> num('3.14')
 => 3.14
-irb(main):008:0> num('3.982e5')
+>> num('3.982e5')
 => 398200.0
 
-irb(main):009:0> s = '56'
+>> s = '56'
 => "56"
-irb(main):010:0> num(s) + 44
+>> num(s) + 44
 => 100
 ```
 
@@ -132,17 +133,17 @@ ArgumentError (could not convert string to int or float)
 * Only one output, divisible by 42 takes precedence
 
 ```ruby
-irb(main):001:0> six_by_seven(66)
+>> six_by_seven(66)
 => "Food"
-irb(main):002:0> six_by_seven(13)
+>> six_by_seven(13)
 => "Oops"
-irb(main):003:0> six_by_seven(42)
+>> six_by_seven(42)
 => "Universe"
-irb(main):004:0> six_by_seven(14)
+>> six_by_seven(14)
 => "Good"
-irb(main):005:0> six_by_seven(84)
+>> six_by_seven(84)
 => "Universe"
-irb(main):006:0> six_by_seven(235432)
+>> six_by_seven(235432)
 => "Oops"
 ```
 
@@ -174,9 +175,9 @@ irb(main):006:0> six_by_seven(235432)
 * second list should contain groups of decimal, binary and octal numbers
 
 ```ruby
-irb(main):001:0> num_palindrome(6, 20)
+>> num_palindrome(6, 20)
 => [[["7", "111"], ["9", "1001"]], [["7", "111", "7"], ["9", "1001", "11"]]]
-irb(main):002:0> num_palindrome(300, 600)
+>> num_palindrome(300, 600)
 => [[["313", "100111001"], ["585", "1001001001"]], [["585", "1001001001", "1111"]]]
 ```
 
@@ -187,17 +188,17 @@ irb(main):002:0> num_palindrome(300, 600)
 **Q4a)** Write a function that returns product of all numbers of a list/range
 
 ```ruby
-irb(main):001:0> product([1, 4, 21])
+>> product([1, 4, 21])
 => 84
-irb(main):002:0> product([-4, 2.3e12, 77.23, 982, 0b101])
+>> product([-4, 2.3e12, 77.23, 982, 0b101])
 => -3.48863356e+18
-irb(main):003:0> product([-3, 11, 2])
+>> product([-3, 11, 2])
 => -66
-irb(main):004:0> product([8, 300])
+>> product([8, 300])
 => 2400
-irb(main):005:0> product([234, 121, 23, 945, 0])
+>> product([234, 121, 23, 945, 0])
 => 0
-irb(main):006:0> product(1..5)
+>> product(1..5)
 => 120
 ```
 
@@ -206,25 +207,25 @@ irb(main):006:0> product(1..5)
 *Note* that duplicates shouldn't affect determining nth lowest
 
 ```ruby
-irb(main):001:0> nums = [42, 23421341, 234.2e3, 21, 232, 12312, -2343]
+>> nums = [42, 23421341, 234.2e3, 21, 232, 12312, -2343]
 => [42, 23421341, 234200.0, 21, 232, 12312, -2343]
-irb(main):002:0> nth_lowest(nums, 3)
+>> nth_lowest(nums, 3)
 => 42
-irb(main):003:0> nth_lowest(nums, 5)
+>> nth_lowest(nums, 5)
 => 12312
 
-irb(main):004:0> nums = [1, -2, 4, 2, 1, 3, 3, 5]
+>> nums = [1, -2, 4, 2, 1, 3, 3, 5]
 => [1, -2, 4, 2, 1, 3, 3, 5]
-irb(main):005:0> nth_lowest(nums)
+>> nth_lowest(nums)
 => -2
-irb(main):006:0> nth_lowest(nums, 4)
+>> nth_lowest(nums, 4)
 => 3
 
-irb(main):007:0> nth_lowest('unrecognizable', 3)
+>> nth_lowest('unrecognizable', 3)
 => "c"
-irb(main):008:0> nth_lowest('jump', 2)
+>> nth_lowest('jump', 2)
 => "m"
-irb(main):009:0> nth_lowest('abracadabra', 5)
+>> nth_lowest('abracadabra', 5)
 => "r"
 ```
 
@@ -270,47 +271,47 @@ $ ./extract_sum.rb
 See also [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance)
 
 ```ruby
-irb(main):001:0> is_one_char_diff('bar', 'bar')
+>> is_one_char_diff('bar', 'bar')
 => true
-irb(main):002:0> is_one_char_diff('bar', 'Baz')
+>> is_one_char_diff('bar', 'Baz')
 => true
-irb(main):003:0> is_one_char_diff('Food', 'fold')
+>> is_one_char_diff('Food', 'fold')
 => true
-irb(main):004:0> is_one_char_diff('A', 'b')
+>> is_one_char_diff('A', 'b')
 => true
 
-irb(main):005:0> is_one_char_diff('a', '')
+>> is_one_char_diff('a', '')
 => false
-irb(main):006:0> is_one_char_diff('Bar', 'Bark')
+>> is_one_char_diff('Bar', 'Bark')
 => false
-irb(main):007:0> is_one_char_diff('Bar', 'art')
+>> is_one_char_diff('Bar', 'art')
 => false
-irb(main):008:0> is_one_char_diff('Food', 'fled')
+>> is_one_char_diff('Food', 'fled')
 => false
-irb(main):009:0> is_one_char_diff('ab', '')
+>> is_one_char_diff('ab', '')
 => false
 ```
 
 **Q6b)** Check if each word of a sentence(separated by whitespace) is in ascending/descending alphabetic order or not (irrespective of case)
 
 ```ruby
-irb(main):001:0> is_alpha_order('bot')
+>> is_alpha_order('bot')
 => true
-irb(main):002:0> is_alpha_order('AborT')
+>> is_alpha_order('AborT')
 => true
-irb(main):003:0> is_alpha_order('toe')
+>> is_alpha_order('toe')
 => true
 
-irb(main):004:0> is_alpha_order('are')
+>> is_alpha_order('are')
 => false
-irb(main):005:0> is_alpha_order('Flee')
+>> is_alpha_order('Flee')
 => false
 
-irb(main):006:0> is_alpha_order('Toe got bit')
+>> is_alpha_order('Toe got bit')
 => true
-irb(main):007:0> is_alpha_order('All is well')
+>> is_alpha_order('All is well')
 => false
-irb(main):008:0> is_alpha_order('Food is good')
+>> is_alpha_order('Food is good')
 => false
 ```
 
@@ -321,24 +322,44 @@ Unbalanced, empty or wrongly ordered braces should return `-1`
 Hint: Iterate over string characters or use regular expressions
 
 ```ruby
-irb(main):001:0> max_nested_braces('a*b')
+>> max_nested_braces('a*b')
 => 0
-irb(main):002:0> max_nested_braces('{a+2}*{b+c}')
+>> max_nested_braces('{a+2}*{b+c}')
 => 1
-irb(main):003:0> max_nested_braces('{{a+2}*{{b+{c*d}}+e*d}}')
+>> max_nested_braces('{{a+2}*{{b+{c*d}}+e*d}}')
 => 4
-irb(main):007:0> max_nested_braces('{{a+2}*{b+{c*d}}+e}')
+>> max_nested_braces('{{a+2}*{b+{c*d}}+e}')
 => 3
 
-irb(main):004:0> max_nested_braces('a*b+{}')
+>> max_nested_braces('a*b+{}')
 => -1
-irb(main):005:0> max_nested_braces('}a+b{')
+>> max_nested_braces('}a+b{')
 => -1
-irb(main):006:0> max_nested_braces('a*b{')
+>> max_nested_braces('a*b{')
 => -1
 ```
 
+<br>
 
+## <a name="misc"></a>7) Misc
+
+**Q7a)** Write a function that
+
+* accepts a filesystem path(default) or a url(indicated by true as second argument)
+* returns the longest word(here word is defined as one or more consecutive sequence of alphabets of either case)
+* assume that input is small enough to fit in memory and that there's only one distinct longest word
+
+```ruby
+>> ip_path = 'poem.txt'
+=> "poem.txt"
+>> longest_word(ip_path)
+=> "Violets"
+
+>> ip_path = 'https://www.gutenberg.org/files/60/60.txt'
+=> "https://www.gutenberg.org/files/60/60.txt"
+>> longest_word(ip_path, true)
+=> "misunderstandings"
+```
 
 
 <br>
