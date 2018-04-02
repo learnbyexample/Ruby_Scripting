@@ -145,10 +145,10 @@ Green
 
 >> str1 = 'Hello'
 => "Hello"
->> msg = "#{str1} there"        
+>> msg = "#{str1} there"
 => "Hello there"
 
->> c = 5    
+>> c = 5
 => 5
 >> "I want #{c} apples and #{c*2} mangoes"
 => "I want 5 apples and 10 mangoes"
@@ -169,8 +169,8 @@ Green
 => "Hello World"
 
 >> fmt = '-' * 27
-=> "-------------------------"
->> puts "#{fmt}\n\t#{str1+str2}\n#{fmt}"
+=> "---------------------------"
+>> puts "#{fmt}\n\t#{str1}\n#{fmt}"
 ---------------------------
         Hello World
 ---------------------------
@@ -187,6 +187,10 @@ Green
 => "It's so good"
 
 # %Q for double quoted strings
+>> f1 = 'mango'
+=> "mango"
+>> f2 = 'orange'
+=> "orange"
 >> puts %Q/I like "#{f1}" and "#{f2}"/
 I like "mango" and "orange"
 => nil
