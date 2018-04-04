@@ -3,7 +3,7 @@
 1) [Variables and Print](#variables-and-print)
 2) [Functions](#functions)
 3) [Control structures](#control-structures)
-4) [List](#list)
+4) [Arrays](#arrays)
 5) [File](#file)
 6) [Text processing](#text-processing)
 7) [Misc](#misc)
@@ -170,9 +170,9 @@ ArgumentError (could not convert string to int or float)
 
 * accepts two integers
 * for all integers in the range defined by them, find all numbers that are simultaneously palindromes in decimal, binary and octal representations - for example, **585** is palindrome in all three representations
-* return the result as list of lists
-* first list should contain pairs of decimal and binary numbers
-* second list should contain groups of decimal, binary and octal numbers
+* return the result as array of arrays
+* first array should contain pairs of decimal and binary numbers
+* second array should contain groups of decimal, binary and octal numbers
 
 ```ruby
 >> num_palindrome(6, 20)
@@ -183,9 +183,9 @@ ArgumentError (could not convert string to int or float)
 
 <br>
 
-## <a name="list"></a>4) List
+## <a name="arrays"></a>4) Arrays
 
-**Q4a)** Write a function that returns product of all numbers of a list/range
+**Q4a)** Write a function that returns product of all numbers of an array/range
 
 ```ruby
 >> product([1, 4, 21])
@@ -202,7 +202,7 @@ ArgumentError (could not convert string to int or float)
 => 120
 ```
 
-**Q4b)** Write a function that returns nth lowest of a list/string. Return the lowest if second argument is not specified
+**Q4b)** Write a function that returns nth lowest of an array/string. Return the lowest if second argument is not specified
 
 *Note* that duplicates shouldn't affect determining nth lowest
 
@@ -229,6 +229,24 @@ ArgumentError (could not convert string to int or float)
 => "r"
 ```
 
+**Q4c)** Write a function that accepts a string input and returns slices
+
+* if input string is less than 3 characters long, return an array with input string as the only element
+* otherwise, return array with all string slices greater than 1 character long
+* order of slices should be same as shown in examples below
+
+```ruby
+>> word_slices('i')
+=> ["i"]
+>> word_slices('to')
+=> ["to"]
+
+>> word_slices('are')
+=> ["ar", "are", "re"]
+>> word_slices('table')
+=> ["ta", "tab", "tabl", "table", "ab", "abl", "able", "bl", "ble", "le"]
+```
+
 <br>
 
 ## <a name="file"></a>5) File
@@ -249,7 +267,7 @@ $ ./col_sum.rb
 10485.14
 ```
 
-**Q5b)** Print sum of all numbers (assume only positive integer numbers) from a file containing arbitrary string
+**Q5b)** Print sum of all numbers (assume only positive integer numbers) from a ASCII encoded file containing arbitrary string
 
 ```
 $ cat f2.txt 
@@ -260,6 +278,38 @@ How are 1784 you
 
 $ ./extract_sum.rb 
 2298
+```
+
+**Q5c)** Sort file contents in alphabetic order based on each line's extension
+
+* extension here is defined as the string after the last `.` in the line
+* if line doesn't have a `.`, those lines should come before lines with `.`
+* sorting should be case-insensitive
+* use rest of string as tie-breaker if there are more than one line with same extension
+* assume input file is ASCII encoded and small enough to fit in memory
+
+*bonus*: instead of printing results to stdout, change the input file itself with sorted result
+
+```bash
+$ cat f3.txt
+power.Log
+foo.123.txt
+list
+report_12.log
+baz.TXT
+hello.RB
+loop.do.rb
+Fav_books
+
+$ ./sort_by_ext.rb
+Fav_books
+list
+power.Log
+report_12.log
+hello.RB
+loop.do.rb
+baz.TXT
+foo.123.txt
 ```
 
 <br>
