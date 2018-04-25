@@ -9,6 +9,7 @@
 <br>
 
 From [wikipedia](https://en.wikipedia.org/wiki/Ruby_(programming_language))
+
 >Ruby is a dynamic, reflective, object-oriented, general-purpose programming language. It was designed and developed in the mid-1990s by Yukihiro "Matz" Matsumoto in Japan. According to the creator, Ruby was influenced by Perl, Smalltalk, Eiffel, Ada, and Lisp. It supports multiple programming paradigms, including functional, object-oriented, and imperative. It also has a dynamic type system and automatic memory management
 
 <br>
@@ -68,45 +69,44 @@ Hello World
 ## <a name="ruby-repl"></a>Ruby REPL
 
 * It is generally used to execute snippets of Ruby language as a means to learning Ruby or for debugging purposes
-* Some of the topics in coming chapters will be complemented with examples using this
-* A special variable `_` holds the result of last printed expression
+* Result of entered expression is displayed with a prefix `=>`
+    * also, a special variable `_` holds the result of last expression in the interactive session
 * use `exit` to end the interactive session
 
 ```ruby
+$ # puts always returns nil
 $ irb
 irb(main):001:0> puts 'hi'     
 hi
 => nil
-irb(main):002:0> abc
-Traceback (most recent call last):
-        2: from /usr/local/bin/irb:11:in `<main>'
-        1: from (irb):2
-NameError (undefined local variable or method `abc' for main:Object)
-irb(main):003:0> num = 5
-=> 5
-irb(main):004:0> num
-=> 5
-irb(main):005:0> 3 + 4
-=> 7
-irb(main):006:0> 12 + _
-=> 19
-irb(main):007:0> exit
+irb(main):002:0> exit
 ```
 
 * `irb` can be customized in many ways, see document link for details
-* in coming chapters, `irb --simple-prompt` will be used for simplicity
+* here on, `irb --simple-prompt` will be used for simplicity
 
 ```ruby
 $ alias irb='irb --simple-prompt'
 
 $ irb
->> 34 + 3.14
-=> 37.14
+>> num = 5
+=> 5
+>> num
+=> 5
+>> 3 + 4
+=> 7
+>> 12 + _
+=> 19
 >> exit
 ```
+
+* Often, you'd want to re-use previous instructions or correct a mistake
+* On Linux, you need to install the `rb-readline` extension module. Invoking `irb` after that will allow arrow keys for navigation, `ctrl+r` for search, etc
+    * If you are not using environment manager like `RVM`, use `gem install --user-install rb-readline`
 
 **Further Reading**
 
 * [ruby-doc: interactive Ruby](https://ruby-doc.org/stdlib-2.5.0/libdoc/irb/rdoc/IRB.html)
 * [pry](https://github.com/pry/pry)
+* [stackoverflow - installing gems](https://stackoverflow.com/questions/2119064/sudo-gem-install-or-gem-install-and-gem-locations)
 
