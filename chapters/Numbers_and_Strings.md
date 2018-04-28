@@ -4,6 +4,7 @@
 
 * [Numbers](#numbers)
 * [String](#string)
+* [Objects](#objects)
 
 <br>
 
@@ -201,4 +202,47 @@ I like "mango" and "orange"
 * [ruby-doc: strings](https://ruby-doc.org/core-2.5.0/String.html)
 * [ruby-doc: Percent Strings](https://ruby-doc.org/core-2.5.0/doc/syntax/literals_rdoc.html#label-Percent+Strings)
 * [ruby-doc: List of Escape Sequences and more info on strings](https://ruby-doc.org/core-2.5.0/doc/syntax/literals_rdoc.html#label-Strings)
+
+<br>
+
+## <a name="objects"></a>Objects
+
+* Everything in Ruby is an object
+
+```ruby
+>> 42.class
+=> Integer
+
+>> 3.2e3.class
+=> Float
+
+>> 'hello'.class
+=> String
+
+>> foo = [1, 4]
+=> [1, 4]
+>> foo.class
+=> Array
+```
+
+* Use `help` within `irb` to get documentation for a method(assumes [Ruby Docs is installed](https://stackoverflow.com/questions/3178900/how-do-i-install-the-ruby-ri-documentation/13886612#13886612))
+    * ex: `help 'Integer.lcm'` for [ruby-doc: Integer.lcm](https://ruby-doc.org/core-2.5.0/Integer.html#method-i-lcm)
+
+```ruby
+>> Integer.sqrt(25)
+=> 5
+>> 2.lcm(3)
+=> 6
+>> 64.gcd(36)
+=> 4
+
+>> 'hello'.upcase
+=> "HELLO"
+```
+
+**Further Reading**
+
+* [Official Ruby FAQ](https://www.ruby-lang.org/en/documentation/faq/1/)
+* [ruby-doc: Object](https://ruby-doc.org/core-2.5.0/Object.html)
+* [wikipedia: Object-oriented programming](https://en.wikipedia.org/wiki/Object-oriented_programming)
 
