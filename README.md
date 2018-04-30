@@ -15,6 +15,7 @@
 
 * [Introduction](./chapters/Introduction.md)
 * [Numbers and Strings](./chapters/Numbers_and_Strings.md)
+* [Getting User input](./chapters/User_input.md)
 * [Exercises](./chapters/Exercises.md)
 
 <br>
