@@ -143,3 +143,36 @@ hi
 => 0
 ```
 
+* One can also use `Integer` and `Float` methods provided by `Kernel` module
+    * Note that these are different from classes of same name
+* These are more strict - only whitespace is allowed around the number present in the input string
+
+```bash
+>> Integer(gets)
+42
+=> 42
+
+>> Integer('12c')
+Traceback (most recent call last):
+        3: from /usr/local/bin/irb:11:in `<main>'
+        2: from (irb):2
+        1: from (irb):2:in `Integer'
+ArgumentError (invalid value for Integer(): "12c")
+>> '12c'.to_i
+=> 12
+
+>> Float("\t 4.12 \n ")
+=> 4.12
+
+# handling non-decimal input
+>> '0b100'.to_i(base=2)
+=> 4
+>> Integer('0b100')
+=> 4
+```
+
+**Further Reading**
+
+* [ruby-doc: to_i](https://ruby-doc.org/core-2.5.0/String.html#method-i-to_i)
+* [ruby-doc: Integer method](https://ruby-doc.org/core-2.5.0/Kernel.html#method-i-Integer)
+
