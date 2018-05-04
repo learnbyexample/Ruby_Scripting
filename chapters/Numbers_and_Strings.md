@@ -4,7 +4,7 @@
 
 * [Numbers](#numbers)
 * [String](#string)
-* [Objects](#objects)
+* [Objects and Expressions](#objects-and-expressions)
 
 <br>
 
@@ -205,7 +205,7 @@ I like "mango" and "orange"
 
 <br>
 
-## <a name="objects"></a>Objects
+## <a name="objects-and-expressions"></a>Objects and Expressions
 
 * Everything in Ruby is an object
 
@@ -223,6 +223,9 @@ I like "mango" and "orange"
 => [1, 4]
 >> foo.class
 => Array
+
+>> nil.class
+=> NilClass
 ```
 
 * Use `help` within `irb` to get documentation for a method(assumes [Ruby Docs is installed](https://stackoverflow.com/questions/3178900/how-do-i-install-the-ruby-ri-documentation/13886612#13886612))
@@ -238,6 +241,53 @@ I like "mango" and "orange"
 
 >> 'hello'.upcase
 => "HELLO"
+```
+
+* Everything in Ruby is an expression
+
+```ruby
+# num1 is assigned 5
+# return value of this expression is 5
+>> num1 = 5
+=> 5
+
+# return value of 'num1 = 42' is 42
+# so num2 also is assigned the value 42
+>> num2 = num1 = 42
+=> 42
+>> num1
+=> 42
+>> num2
+=> 42
+
+# return value of puts is always nil value
+>> a = puts('hi')
+hi
+=> nil
+>> a
+=> nil
+```
+
+* Unlike Python, strings in Ruby are mutable
+
+```ruby
+# in-place changing either str1 or str2 will affect the other
+>> str2 = str1 = 'hello'
+=> "hello"
+>> str1.object_id
+=> 47109181848080
+>> str2.object_id
+=> 47109181848080
+>> str1 << ' there'
+=> "hello there"
+>> str2
+=> "hello there"
+
+# reassigning won't change the other
+>> str1 = 'foo'
+=> "foo"
+>> str2
+=> "hello there"
 ```
 
 **Further Reading**
