@@ -5,6 +5,7 @@
 * [Defining a method](#defining-a-method)
 * [Arguments and Return](#arguments-and-return)
 * [Default valued arguments](#default-valued-arguments)
+* [Keyword arguments](#keyword-arguments)
 
 <br>
 
@@ -125,8 +126,7 @@ $ ./num_sum.rb
 * method arguments can be given a default value by assigning a value during definition
     * we have previously seen examples for `gets` and `chomp` methods
 * arguments with defaults must be grouped together - can be at start/end/middle, mixed with normal arguments
-* these are still positional - cannot be passed out-of-order while calling
-* See [ruby-doc: Default Positional Arguments](https://ruby-doc.org/core-2.5.0/doc/syntax/calling_methods_rdoc.html#label-Default+Positional+Arguments) for more complicated use cases
+    * these are still positional - cannot be passed out-of-order while calling
 
 ```ruby
 #!/usr/bin/env ruby
@@ -164,4 +164,72 @@ $ ./styled_greeting.rb
  3.14 
 ******
 ```
+
+* Note that it is optional to use variable assignment while calling a method having default valued arguments
+    * and the variable name used can be completely different
+* See [ruby-doc: Default Positional Arguments](https://ruby-doc.org/core-2.5.0/doc/syntax/calling_methods_rdoc.html#label-Default+Positional+Arguments) for more complicated use cases
+
+```ruby
+>> def styled_line(char='*')
+>>   puts char * 20
+>> end
+=> :styled_line
+
+>> styled_line
+********************
+=> nil
+
+>> styled_line(':')
+::::::::::::::::::::
+=> nil
+
+>> styled_line(c='z')
+zzzzzzzzzzzzzzzzzzzz
+=> nil
+>> c
+=> "z"
+```
+
+<br>
+
+## <a name="keyword-arguments"></a>Keyword arguments
+
+* they are similar to default valued arguments but allows out-of-order passing of arguments while calling
+* if there are positional arguments too, they must be defined before keyword arguments
+* keyword arguments cannot be passed as positional argument, the keyword has to be always specified
+
+```ruby
+#!/usr/bin/env ruby
+
+def greeting(msg, style_char: '*', fill: 5)
+  gr_len = msg.size + 2*fill
+  gr_dec = style_char * gr_len
+  puts gr_dec, msg.center(gr_len), gr_dec
+end
+
+greeting('hi')
+greeting('oh', style_char: '=')
+greeting('42', fill: 2, style_char: '%')
+greeting('3.14', fill: 1)    
+```
+
+*Running the above script*
+
+```
+$ ./keyword_args.rb 
+************
+     hi     
+************
+============
+     oh     
+============
+%%%%%%
+  42  
+%%%%%%
+******
+ 3.14 
+******
+```
+
+
 
