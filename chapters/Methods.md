@@ -6,6 +6,7 @@
 * [Arguments and Return](#arguments-and-return)
 * [Default valued arguments](#default-valued-arguments)
 * [Keyword arguments](#keyword-arguments)
+* [Special method names](#special-method-names)
 
 <br>
 
@@ -231,5 +232,50 @@ $ ./keyword_args.rb
 ******
 ```
 
+<br>
+
+## <a name="special-method-names"></a>Special method names
+
+* method names ending with `!` are used to indicate that it modifies the object
+
+```ruby
+>> msg = 'hi there'
+=> "hi there"
+# replaces hi with hello, but doesn't change content of variable
+>> msg.sub('hi', 'hello')
+=> "hello there"
+>> msg
+=> "hi there"
+
+# replaces hi with hello, in-place changes content of variable
+>> msg.sub!('hi', 'hello')
+=> "hello there"
+>> msg
+=> "hello there"
+```
+
+* method names ending with `?` are used to indicate it returns `true/false`
+
+```ruby
+# in-built method to check if string has only ascii characters
+>> 'foo-123'.ascii_only?
+=> true
+>> 'hi👍'.ascii_only?
+=> false
+
+# in-built method to check string equality
+>> 'good'.eql?('GooD')
+=> false
+# check string equality irrespective of case
+>> def str_eql_ic?(s1, s2)
+>>   return s1.upcase == s2.upcase
+>> end
+=> :str_eql_ic?
+>> str_eql_ic?('good', 'GooD')
+=> true
+```
+
+* the third and final special character for method names is `=` to indicate assignment method
+    * this is usually used for methods defined inside a `class`
 
 
