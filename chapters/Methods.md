@@ -10,7 +10,7 @@
 
 <br>
 
-In this chapter we'll see how to define and use methods of your own
+In this chapter we'll see how to define and use methods of your own. Some aspects of method definition/usage will be covered in later chapters
 
 <br>
 
@@ -237,6 +237,9 @@ $ ./keyword_args.rb
 ## <a name="special-method-names"></a>Special method names
 
 * method names ending with `!` are used to indicate that it modifies the object
+* Note that this is a guideline and not enforced by Ruby
+
+*Example for in-built String method*
 
 ```ruby
 >> msg = 'hi there'
@@ -254,6 +257,22 @@ $ ./keyword_args.rb
 => "hello there"
 ```
 
+*Example for user defined method*
+
+```bash
+>> def add_hi!(str)
+>>   str << 'hi'
+>> end
+=> :add_hi!
+
+>> msg = 'foo'
+=> "foo"
+>> add_hi!(msg)
+=> "foohi"
+>> msg
+=> "foohi"
+```
+
 * method names ending with `?` are used to indicate it returns `true/false`
 
 ```ruby
@@ -263,19 +282,17 @@ $ ./keyword_args.rb
 >> 'hi👍'.ascii_only?
 => false
 
-# in-built method to check string equality
->> 'good'.eql?('GooD')
-=> false
-# check string equality irrespective of case
->> def str_eql_ic?(s1, s2)
->>   return s1.upcase == s2.upcase
+# a basic palindrome method
+>> def palindrome?(str)
+>>   return str == str.reverse
 >> end
-=> :str_eql_ic?
->> str_eql_ic?('good', 'GooD')
+=> :palindrome?
+>> palindrome?('madam')
 => true
+>> palindrome?('bad')
+=> false
 ```
 
 * the third and final special character for method names is `=` to indicate assignment method
     * this is usually used for methods defined inside a `class`
-
 
