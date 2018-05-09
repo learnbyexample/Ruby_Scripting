@@ -7,6 +7,7 @@
 * [Default valued arguments](#default-valued-arguments)
 * [Keyword arguments](#keyword-arguments)
 * [Special method names](#special-method-names)
+* [Variable Scope](#variable-scope)
 
 <br>
 
@@ -295,4 +296,61 @@ $ ./keyword_args.rb
 
 * the third and final special character for method names is `=` to indicate assignment method
     * this is usually used for methods defined inside a `class`
+    * See [ruby-doc: Assignment Methods](https://ruby-doc.org/core-2.5.0/doc/syntax/assignment_rdoc.html#label-Assignment+Methods) for examples
+
+<br>
+
+## <a name="variable-scope"></a>Variable Scope
+
+* the variables we've defined so far are all `local` variables
+* such variables defined outside of a method are not visible to the method
+
+```ruby
+#!/usr/bin/env ruby
+
+num = 25
+
+def print_num
+  puts num
+end
+
+print_num
+```
+
+*Running the above script will result in NameError exception*
+
+```
+$ ./variable_scope_1.rb
+Traceback (most recent call last):
+	1: from ./variable_scope_1.rb:9:in `<main>'
+./variable_scope_1.rb:6:in `print_num': undefined local variable
+        or method `num' for main:Object (NameError)
+```
+
+* Similarly, variable defined inside a method is not visible outside its scope
+
+```ruby
+#!/usr/bin/env ruby
+
+def square_of_num(num)
+  sq_num = num * num
+end
+
+square_of_num(5)
+puts "sq_num = #{sq_num}"
+```
+
+*Running the above script will also result in NameError exception*
+
+```
+$ ./variable_scope_2.rb
+Traceback (most recent call last):
+./variable_scope_2.rb:8:in `<main>': undefined local variable
+        or method `sq_num' for main:Object (NameError)
+```
+
+**Further Reading**
+
+* [ruby-doc: Instance Variables](https://ruby-doc.org/core-2.5.0/doc/syntax/assignment_rdoc.html#label-Instance+Variables)
+* [stackoverflow: Difference between various variables scopes in ruby](https://stackoverflow.com/questions/11495098/difference-between-various-variables-scopes-in-ruby)
 
