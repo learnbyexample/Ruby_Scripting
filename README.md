@@ -27,11 +27,7 @@
     * Even for pull requests, open an issue for discussion before submitting PRs
     * or [gitter group chat](https://gitter.im/learnbyexample/scripting_course) for discussion
 * Share the repo with friends/colleagues, on social media, etc to help reach other learners
-
-<br>
-
-[![support learnbyexample](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/learnbyexample/donate)
-
+* Contribute by donating on [liberapay](https://liberapay.com/learnbyexample/donate)
 * In case you need to reach me, use [gitter private chat](https://gitter.im/learnbyexample)
     * or mail me at `echo 'yrneaolrknzcyr.arg@tznvy.pbz' | tr 'a-z' 'n-za-m'`
 
@@ -40,6 +36,9 @@
 # <a name="ebook"></a>ebook
 
 :warning: :construction: Work in progress, stay tuned...
+
+* Read as ebook on [gitbook](https://learnbyexample.gitbooks.io/ruby-scripting/content/index.html)
+* Download ebook for offline reading - [link](https://www.gitbook.com/book/learnbyexample/ruby-scripting/details)
 
 <br>
 
