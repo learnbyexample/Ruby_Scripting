@@ -105,12 +105,12 @@
 
 ## <a name="if"></a>if
 
-* Let's see an example to conditionally change value of a variable
 * the `if` and `end` keywords are used to define the beginning and end of this control structure
     * the boolean expression is provided after `if` keyword
 * like method definition, the convention is to indent the body with two space characters
     * the body is optional - helpful to create placeholders
     * return value is the result of last expression that gets executed
+* let's see an example to conditionally change value of a variable
 
 ```ruby
 #!/usr/bin/env ruby
@@ -156,3 +156,75 @@ Enter an integer: 17
 >> b
 => "baz"
 ```
+
+* to execute code for both true/false cases, add `else` portion
+
+```ruby
+>> num = 3
+=> 3
+>> if num%2 == 0
+>>   puts "#{num} is even"
+>> else
+>>   puts "#{num} is odd"
+>> end
+3 is odd
+=> nil
+```
+
+* for short expressions, the ternary operator `?:` can be used
+
+```ruby
+>> puts num%2 == 0 ? "#{num} is even" : "#{num} is odd"
+3 is odd
+=> nil
+
+>> num = 42
+=> 42
+# use parenthesis for clarity if needed
+>> puts(num%2 == 0 ? "#{num} is even" : "#{num} is odd")
+42 is even
+=> nil
+
+>> x = 23
+=> 23
+>> y = 65
+=> 65
+>> max = x > y ? x : y
+=> 65
+```
+
+* use `elsif` if there are multiple conditions to check
+
+```ruby
+#!/usr/bin/env ruby
+
+num = 42
+
+print 'Enter an integer: '
+guess = Integer(gets)
+
+if guess == num
+  puts 'Whoa! you guessed it right'
+elsif guess > num
+  puts 'Oops, you guessed too high'
+else
+  puts 'Oops, you guessed too low'
+end
+```
+
+*Running the above script*
+
+```
+$ ./if_elsif_else.rb
+Enter an integer: 42
+Whoa! you guessed it right
+$ ./if_elsif_else.rb
+Enter an integer: 23
+Oops, you guessed too low
+$ ./if_elsif_else.rb
+Enter an integer: 78
+Oops, you guessed too high
+```
+
+* both the `if` structure and ternary operator can be nested for complicated cases
+
