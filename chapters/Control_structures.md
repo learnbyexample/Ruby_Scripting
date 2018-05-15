@@ -5,6 +5,7 @@
 * [Boolean expressions](#boolean-expressions)
 * [if](#if)
 * [for](#for)
+* [while](#while)
 
 <br>
 
@@ -292,7 +293,7 @@ e
 ```
 
 * to do something `n` number of times, use the `times` method on an integer value
-* in the example below, the code within `{}` is a `block` (we'll see this form more often in coming chapters)
+* in the example below, the code within `{}` is a `block` (we'll see this form more often here on)
 
 ```ruby
 >> 2.times { puts 'hi' }
@@ -323,10 +324,11 @@ hi
 * for descending order, either use `reverse_each` or use `downto/step` method on an integer
 
 ```ruby
->> (1..2).each { |i| puts i }
+>> (1..10).step(4).each { |i| puts i }
 1
-2
-=> 1..2
+5
+9
+=> 1..10
 
 >> (1..2).reverse_each { |i| puts i }
 2
@@ -344,4 +346,36 @@ hi
 1
 => 5
 ```
+
+**Further Reading**
+
+* [ruby-doc: Range](https://ruby-doc.org/core-2.5.0/Range.html)
+* [stackoverflow: explanation for Ruby blocks](https://stackoverflow.com/questions/4911353/best-explanation-of-ruby-blocks)
+
+<br>
+
+## <a name="while"></a>while
+
+* while loop allows us to execute code until a condition is satisfied
+
+```ruby
+#!/usr/bin/env ruby
+
+ip_str = 'foo'
+while ip_str != ip_str.reverse
+  print 'Enter a palindrome word: '
+  ip_str = gets.chomp.upcase
+end
+```
+
+*Running the above script*
+
+```
+$ ./while_loop.rb
+Enter a palindrome word: Hi
+Enter a palindrome word: bye
+Enter a palindrome word: Wow
+```
+
+
 
