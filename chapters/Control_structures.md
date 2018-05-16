@@ -6,6 +6,7 @@
 * [if](#if)
 * [for](#for)
 * [while](#while)
+* [next and break](#next-and-break)
 
 <br>
 
@@ -109,6 +110,7 @@
 
 * the `if` and `end` keywords are used to define the beginning and end of this control structure
     * the boolean expression is provided after `if` keyword
+    * using `unless` keyword instead of `if` will conditionally execute code when condition is `false`
 * like method definition, the convention is to indent the body with two space characters
     * the body is optional - helpful to create placeholders
     * return value is the result of last expression that gets executed
@@ -157,6 +159,10 @@ Enter an integer: 17
 => "foo"
 >> b
 => "baz"
+
+# conditionally execute code if boolean expression evaluates to false
+>> b = 42 unless b > a
+=> 42
 ```
 
 * to execute code for both true/false cases, add `else` portion
@@ -356,7 +362,8 @@ hi
 
 ## <a name="while"></a>while
 
-* while loop allows us to execute code until a condition is satisfied
+* `while` loop allows us to execute code as long as the given boolean expression evaluates to `true`
+    * use `until` keyword instead of `while` to loop as long as boolean expression evaluates to `false`
 
 ```ruby
 #!/usr/bin/env ruby
@@ -377,5 +384,91 @@ Enter a palindrome word: bye
 Enter a palindrome word: Wow
 ```
 
+* like `if/unless`, one can specify `while/until` after an expression
 
+```ruby
+>> s = 'spittoon'
+=> "spittoon"
+
+# recursively delete 'to' as long as string contains 'to'
+>> s.sub!('to', '') while s.match('to')
+=> nil
+>> s
+=> "spin"
+```
+
+<br>
+
+## <a name="next-and-break"></a>next and break
+
+* use `next` to skip rest of code in the loop and start next iteration
+
+```ruby
+#!/usr/bin/env ruby
+
+for i in 1..9
+  next if rand(2)%2 == 0
+
+  chr = rand(20)%3 == 1 ? '*' : '-'
+  str = rand(10).to_s * i
+  puts str.center(20, chr)
+end
+```
+
+*Running the above script*
+
+```
+$ ./loop_with_next.rb
+--------000---------
+-------99999--------
+-------666666-------
+******55555555******
+-----222222222------
+
+$ ./loop_with_next.rb
+---------55---------
+--------0000--------
+*****777777777******
+```
+
+* use `break` to skip rest of code in the loop (if any) and exit loop
+
+```ruby
+#!/usr/bin/env ruby
+
+while true
+  rand_num = rand(1..500)
+  break if rand_num%4 == 0 && rand_num%6 == 0
+end
+
+puts "Random number divisible by 4 and 6: #{rand_num}"
+```
+
+*Running the above script*
+
+```
+$ ./loop_with_break.rb
+Random number divisible by 4 and 6: 216
+$ ./loop_with_break.rb
+Random number divisible by 4 and 6: 456
+$ ./loop_with_break.rb
+Random number divisible by 4 and 6: 60
+```
+
+* the *while_loop.rb* example can be re-written using `break`
+
+```ruby
+>> while true
+>>   print 'Enter a palindrome word: '
+>>   ip_str = gets.chomp.upcase
+>>   break if ip_str == ip_str.reverse
+>> end
+Enter a palindrome word: hi
+Enter a palindrome word: bye
+Enter a palindrome word: gag
+=> nil
+```
+
+* in case of nested loops, `next` and `break` only affect the immediate parent loop
+* See also [stackoverflow: using redo in a loop](https://stackoverflow.com/questions/29269421/rubys-redo-method-vs-while-loop)
 
