@@ -14,9 +14,15 @@
 :warning: :construction: Work in progress, stay tuned...
 
 * [Introduction](./chapters/Introduction.md)
+    * [Installation](./chapters/Introduction.md#installation), [Hello World example](./chapters/Introduction.md#hello-world-example), [Ruby REPL](./chapters/Introduction.md#ruby-repl)
 * [Numbers and Strings](./chapters/Numbers_and_Strings.md)
+    * [Numbers](./chapters/Numbers_and_Strings.md#numbers), [String](./chapters/Numbers_and_Strings.md#string), [Objects and Expressions](./chapters/Numbers_and_Strings.md#objects-and-expressions)
 * [Getting User input](./chapters/User_input.md)
+    * [String input](./chapters/User_input.md#string-input), [Converting string to other data types](./chapters/User_input.md#converting-string-to-other-data-types)
 * [Methods](./chapters/Methods.md)
+    * [Defining a method](./chapters/Methods.md#defining-a-method), [Arguments and Return](./chapters/Methods.md#arguments-and-return), [Default valued arguments](./chapters/Methods.md#default-valued-arguments), [Keyword arguments](./chapters/Methods.md#keyword-arguments), [Special method names](./chapters/Methods.md#special-method-names), [Variable Scope](./chapters/Methods.md#variable-scope)
+* [Control Structures](./chapters/Control_structures.md)
+    * [Boolean expressions](./chapters/Control_structures.md#boolean-expressions), [if](./chapters/Control_structures.md#if), [for](./chapters/Control_structures.md#for), [while](./chapters/Control_structures.md#while), [next and break](./chapters/Control_structures.md#next-and-break)
 * [Exercises](./chapters/Exercises.md)
 
 <br>
