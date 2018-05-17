@@ -7,6 +7,7 @@
 * [for](#for)
 * [while](#while)
 * [next and break](#next-and-break)
+* [Variable Scope](#variable-scope)
 
 <br>
 
@@ -471,4 +472,78 @@ Enter a palindrome word: gag
 
 * in case of nested loops, `next` and `break` only affect the immediate parent loop
 * See also [stackoverflow: using redo in a loop](https://stackoverflow.com/questions/29269421/rubys-redo-method-vs-while-loop)
+
+<br>
+
+## <a name="variable-scope"></a>Variable Scope
+
+* the `if/for/while` control structures have same scope as the code within which they are used
+
+```ruby
+>> for i in 1..3
+>>   for j in 1..3
+>>     num = i * j
+>>   end
+>> end
+=> 1..3
+>> num
+=> 9
+```
+
+* the block arguments defined within `||` won't affect variable of same name in the given scope
+    * they are similar to argument names used while defining a method
+    * block here means both `{}` and `do..end` forms
+
+```ruby
+>> i = 'foo'
+=> "foo"
+
+>> (2..3).each do |i|
+?>   puts i
+>> end
+2
+3
+=> 2..3
+>> i
+=> "foo"
+
+>> 5.downto(3) { |i| puts i }
+5
+4
+3
+=> 5
+>> i
+=> "foo"
+```
+
+* variables created within block are local to that block and not visible outside
+
+```ruby
+>> 2.times { i = 10; puts 'hi' }
+hi
+hi
+=> 2
+>> i
+Traceback (most recent call last):
+        2: from /usr/local/bin/irb:11:in `<main>'
+        1: from (irb):2
+NameError (undefined local variable or method `i' for main:Object)
+```
+
+* however, existing variables in the given scope will be visible inside the block and can be modified
+
+```ruby
+>> num = 25
+=> 25
+
+>> 2.times { puts num }
+25
+25
+=> 2
+
+>> 3.times { num *= num }
+=> 3
+>> num
+=> 152587890625
+```
 
