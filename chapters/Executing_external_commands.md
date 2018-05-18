@@ -4,6 +4,7 @@
 
 * [Issuing commands](#issuing-commands)
     * [Exit status](#exit-status)
+* [Saving command output](#saving-command-output)
 
 <br>
 
@@ -15,7 +16,7 @@
     * the command will be interpreted by shell before executing just like on a commandline (`/bin/sh` is the default on Unix-like systems)
     * do not use this way to execute arbitrary user input, that'd be a security risk
 * or command name and arguments can be separated out
-    * user has to perform necessary expansion before passing the command (methods like `Dir.glob` help in that aspect)
+    * no shell interpretation, user has to perform necessary expansion before passing the command (methods like `Dir.glob` help in that aspect)
     * this way is preferred when accepting arbitrary user input
 
 ```ruby
@@ -120,4 +121,38 @@ Command exit status: 127
 * [ruby-doc: exec](https://ruby-doc.org/core-2.5.0/Kernel.html#method-i-exec)
 * [ruby-doc: Process::Status](https://ruby-doc.org/core-2.5.0/Process/Status.html)
 * [stackoverflow: difference between exec, system and %x or backticks](https://stackoverflow.com/questions/6338908/ruby-difference-between-exec-system-and-x-or-backticks)
+
+<br>
+
+## <a name="saving-command-output"></a>Saving command output
+
+* to save stdout of external command in a variable, place the command within backticks
+* or use percent string `%x`, which allows to use different delimiters
+* use this only if the command is known, if not use `Open3` which allows separating out command and arguments like `system` method
+
+```ruby
+>> working_dir = `pwd`
+=> "/home/learnbyexample/ruby_programs\n"
+>> working_dir.chomp
+=> "/home/learnbyexample/ruby_programs"
+
+>> nums = %x/seq 3/
+=> "1\n2\n3\n"
+>> puts nums
+1
+2
+3
+=> nil
+
+>> foo = %x(echo `seq 2`).chomp
+=> "1 2"
+
+>> op = %x{ls *.txt *.log}
+ls: cannot access '*.log': No such file or directory
+=> "out.txt\n"
+```
+
+* [ruby-doc: backtick](https://ruby-doc.org/core-2.5.0/Kernel.html#method-i-60)
+* [ruby-doc: Open3](https://ruby-doc.org/stdlib-2.5.0/libdoc/open3/rdoc/Open3.html)
+* [stackoverflow: capturing stderr output](https://stackoverflow.com/questions/25244993/ruby-capture-stderr-output-from-bash-script-execution)
 
