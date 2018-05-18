@@ -147,10 +147,13 @@ Command exit status: 127
 >> foo = %x(echo `seq 2`).chomp
 => "1 2"
 
->> op = %x{ls *.txt *.log}
+# only stdout is saved
+>> files = %x{ls *.txt *.log}
 ls: cannot access '*.log': No such file or directory
 => "out.txt\n"
 ```
+
+**Further Reading**
 
 * [ruby-doc: backtick](https://ruby-doc.org/core-2.5.0/Kernel.html#method-i-60)
 * [ruby-doc: Open3](https://ruby-doc.org/stdlib-2.5.0/libdoc/open3/rdoc/Open3.html)
