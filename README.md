@@ -22,7 +22,9 @@
 * [Methods](./chapters/Methods.md)
     * [Defining a method](./chapters/Methods.md#defining-a-method), [Arguments and Return](./chapters/Methods.md#arguments-and-return), [Default valued arguments](./chapters/Methods.md#default-valued-arguments), [Keyword arguments](./chapters/Methods.md#keyword-arguments), [Special method names](./chapters/Methods.md#special-method-names), [Variable Scope](./chapters/Methods.md#variable-scope)
 * [Control Structures](./chapters/Control_structures.md)
-    * [Boolean expressions](./chapters/Control_structures.md#boolean-expressions), [if](./chapters/Control_structures.md#if), [for](./chapters/Control_structures.md#for), [while](./chapters/Control_structures.md#while), [next and break](./chapters/Control_structures.md#next-and-break)
+    * [Boolean expressions](./chapters/Control_structures.md#boolean-expressions), [if](./chapters/Control_structures.md#if), [for](./chapters/Control_structures.md#for), [while](./chapters/Control_structures.md#while), [next and break](./chapters/Control_structures.md#next-and-break), [Variable Scope](./chapters/Control_structures.md#variable-scope)
+* [Executing external commands](./chapters/Executing_external_commands.md)
+    * [Issuing commands](./chapters/Executing_external_commands.md#issuing-commands), [Saving command output](./chapters/Executing_external_commands.md#saving-command-output)
 * [Exercises](./chapters/Exercises.md)
 
 <br>
