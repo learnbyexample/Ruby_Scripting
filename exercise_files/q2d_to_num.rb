@@ -19,6 +19,9 @@ raise unless num(s) + 44 == 100
 s = '8' * 10
 raise unless num(s) == 8888888888
 
+raise unless num('42').class == Integer
+raise unless num('1.23').class == Float
+
 begin
   num('foo')
 rescue ArgumentError => e
