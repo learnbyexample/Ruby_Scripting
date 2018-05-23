@@ -5,7 +5,9 @@
 # <a name="ruby-scripting"></a>Ruby Scripting
 
 * Introduction to Ruby, syntax, issuing external commands, array/string methods, regular expressions, file processing and more...
-* Suitable for a one/two day workshop for Ruby beginners
+* Suitable for those already familiar with programming concepts like variables, printing, control structures, looping, arrays, etc
+    * If you are new to programming, check out [Think Ruby](https://github.com/learnbyexample/ThinkRubyBuild), a translation of **Think Python by Allen Downey** that I'm working on
+* This repo is also suitable as a material reference for a one/two day workshop
 
 <br>
 
@@ -25,6 +27,7 @@
     * [Boolean expressions](./chapters/Control_structures.md#boolean-expressions), [if](./chapters/Control_structures.md#if), [for](./chapters/Control_structures.md#for), [while](./chapters/Control_structures.md#while), [next and break](./chapters/Control_structures.md#next-and-break), [Variable Scope](./chapters/Control_structures.md#variable-scope)
 * [Executing external commands](./chapters/Executing_external_commands.md)
     * [Issuing commands](./chapters/Executing_external_commands.md#issuing-commands), [Saving command output](./chapters/Executing_external_commands.md#saving-command-output)
+* [Arrays](./chapters/Arrays.md)
 * [Exercises](./chapters/Exercises.md)
 
 <br>
