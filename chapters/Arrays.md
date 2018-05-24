@@ -3,6 +3,7 @@
 **Table of Contents**
 
 * [Assignment and Indexing](#assignment-and-indexing)
+* [Slicing](#slicing)
 
 <br>
 
@@ -73,4 +74,104 @@ mango
 >> a[1][0][1]
 => 3
 ```
+
+* `%w` percent string is useful to create an array of strings
+* space is used to separate the strings, which can be escaped if needed
+
+```ruby
+>> fruits = %w[apple mango orange]
+=> ["apple", "mango", "orange"]
+
+>> books = %w{Harry\ Potter Stormlight\ Archive Kingkiller\ Chronicle}
+=> ["Harry Potter", "Stormlight Archive", "Kingkiller Chronicle"]
+
+>> items = %w("foo\nbaz" "123\n42\n65")
+=> ["\"foo\\nbaz\"", "\"123\\n42\\n65\""]
+```
+
+* arrays can also be created using `new` method of Array class
+* helpful to initialize the array with same default value
+* See [ruby-doc: Array](https://ruby-doc.org/core-2.5.0/Array.html) for details
+
+```ruby
+>> nums = Array.new(5, 0)
+=> [0, 0, 0, 0, 0]
+
+>> Array.new(2)
+=> [nil, nil]
+```
+
+<br>
+
+## <a name="slicing"></a>Slicing
+
+* slicing allows to access one or more contiguous elements
+* See [ruby-doc: slice](https://ruby-doc.org/core-2.5.0/Array.html#method-i-slice) for details
+
+```ruby
+>> primes = [2, 3, 5, 7, 11, 13]
+=> [2, 3, 5, 7, 11, 13]
+
+# range can be used to specify start and end index
+>> primes[2..4]
+=> [5, 7, 11]
+>> primes[1..-2]
+=> [3, 5, 7, 11]
+
+# starting index and number of elements needed from that index
+>> primes[1, 3]
+=> [3, 5, 7]
+>> primes[-3, 2]
+=> [7, 11]
+>> primes[1, 0]
+=> []
+>> primes[1, -2]
+=> nil
+```
+
+* the elements specified by slice can be replaced by any another value
+
+```ruby
+>> foo = [42, 904, 'good', 12, 'xyz']
+=> [42, 904, "good", 12, "xyz"]
+
+>> foo[1, 3] = 'treat'.chars
+=> ["t", "r", "e", "a", "t"]
+>> foo
+=> [42, "t", "r", "e", "a", "t", "xyz"]
+
+>> foo[2..-2] = 'baz'
+=> "baz"
+>> foo
+=> [42, "t", "baz", "xyz"]
+```
+
+* related methods - these allow only accessing elements, not modification
+
+```ruby
+>> primes = [2, 3, 5, 7, 11, 13]
+=> [2, 3, 5, 7, 11, 13]
+
+# n elements from start
+>> primes.first(3)
+=> [2, 3, 5]
+
+# last n elements
+>> primes.last(2)
+=> [11, 13]
+
+# except n elements from start
+>> primes.drop(2)
+=> [5, 7, 11, 13]
+
+# elements specified by given index/slice
+>> primes.values_at(1, 3, 0, -1)
+=> [3, 7, 2, 13]
+>> primes.values_at(1, 3..5)
+=> [3, 7, 11, 13]
+```
+
+
+
+
 
