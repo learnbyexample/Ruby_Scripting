@@ -4,6 +4,7 @@
 
 * [Assignment and Indexing](#assignment-and-indexing)
 * [Slicing](#slicing)
+* [Copying Arrays](#copying-arrays)
 
 <br>
 
@@ -15,6 +16,7 @@
 * if negative index is given, size of the array is added to it
     * so, if array size is `3`, an index of `-1` would be interpreted as `-1+3` giving the last element of array
     * similarly, `-2` will give last but one element and so on
+* use `fetch` method to get an error instead of `nil` for out of bound index
 
 ```ruby
 >> nums = [3, 12]
@@ -32,9 +34,11 @@ mango
 >> student[-1]
 => "101CS18"
 
-# out of bound index returns nil
+# out of bound index
 >> nums[2]
 => nil
+>> nums.fetch(2)
+IndexError (index 2 outside of array bounds: -2...2)
 ```
 
 * variables and expressions can also be used instead of values
@@ -171,7 +175,116 @@ mango
 => [3, 7, 11, 13]
 ```
 
+* the splat operator `*` can be used to pass multiple valued object as separate arguments to a method
+* See also [ruby-doc: Array to Arguments Conversion](https://ruby-doc.org/core-2.5.0/doc/syntax/calling_methods_rdoc.html#label-Array+to+Arguments+Conversion)
 
+```ruby
+>> primes = [2, 3, 5, 7, 11, 13]
+=> [2, 3, 5, 7, 11, 13]
 
+>> primes.values_at(*(0...primes.length).step(2))
+=> [2, 5, 11]
 
+>> primes.reverse
+=> [13, 11, 7, 5, 3, 2]
+>> primes.values_at(*(primes.length-1).step(0, -2))
+=> [13, 7, 3]
+```
+
+<br>
+
+## <a name="copying-arrays"></a>Copying Arrays
+
+* arrays are mutable like strings
+* when a variable is assigned to another variable or passed as argument to a method, only the variable's reference is used
+* so, copying an array will result in two variables pointing to same object
+
+```ruby
+>> nums = [3, 61]
+=> [3, 61]
+>> nums_copy = nums
+=> [3, 61]
+
+>> nums_copy[0] = 'foo'
+=> "foo"
+>> nums_copy
+=> ["foo", 61]
+>> nums
+=> ["foo", 61]
+
+>> def foo(a)
+>>   a[1] = 'baz'
+>> end
+=> :foo
+>> foo(nums)
+=> "baz"
+>> nums
+=> ["foo", "baz"]
+>> nums_copy
+=> ["foo", "baz"]
+```
+
+* as long as each object of the array is immutable, clone or slice of the array cannot affect the original array
+
+```ruby
+>> nums = [3, 61]
+=> [3, 61]
+>> nums_copy = nums.clone
+=> [3, 61]
+
+>> nums_copy[0] = 'foo'
+=> "foo"
+>> nums_copy
+=> ["foo", 61]
+>> nums
+=> [3, 61]
+```
+
+* if array contains mutable objects like string or another array, a clone or its slice will affect the original array as well
+
+```ruby
+>> fruits = %w[apple mango guava]
+=> ["apple", "mango", "guava"]
+>> my_fruit = fruits[1]
+=> "mango"
+
+>> my_fruit.upcase!
+=> "MANGO"
+>> fruits
+=> ["apple", "MANGO", "guava"]
+
+# one way to avoid this is cloning the element
+>> foo = fruits[0].clone
+=> "apple"
+>> foo[0] = 'A'
+=> "A"
+>> foo
+=> "Apple"
+>> fruits
+=> ["apple", "MANGO", "guava"]
+```
+
+* using `Marshal` module is one way to create a copy of array without worrying if it is a nested array or contains mutable objects
+* See [ruby-doc: Marshal](https://ruby-doc.org/core-2.5.0/Marshal.html) for caveats
+
+```ruby
+>> foo = [42, [12, 5, 63], ['foo', [7, 6]]]
+=> [42, [12, 5, 63], ["foo", [7, 6]]]
+>> baz = Marshal.load(Marshal.dump(foo))
+=> [42, [12, 5, 63], ["foo", [7, 6]]]
+
+>> baz[0] = 'good'
+=> "good"
+>> baz[1][2] = 42
+=> 42
+>> baz[2][1][0] = 1000
+=> 1000
+>> baz[2][0].upcase!
+=> "FOO"
+
+>> baz
+=> ["good", [12, 5, 42], ["FOO", [1000, 6]]]
+>> foo
+=> [42, [12, 5, 63], ["foo", [7, 6]]]
+```
 
