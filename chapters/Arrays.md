@@ -4,7 +4,8 @@
 
 * [Assignment and Indexing](#assignment-and-indexing)
 * [Slicing](#slicing)
-* [Copying Arrays](#copying-arrays)
+* [Copying](#copying)
+* [Looping](#looping)
 
 <br>
 
@@ -193,7 +194,7 @@ IndexError (index 2 outside of array bounds: -2...2)
 
 <br>
 
-## <a name="copying-arrays"></a>Copying Arrays
+## <a name="copying"></a>Copying
 
 * arrays are mutable like strings
 * when a variable is assigned to another variable or passed as argument to a method, only the variable's reference is used
@@ -247,24 +248,24 @@ IndexError (index 2 outside of array bounds: -2...2)
 => ["apple", "mango", "guava"]
 >> my_fruit = fruits[1]
 => "mango"
-
 >> my_fruit.upcase!
 => "MANGO"
 >> fruits
 => ["apple", "MANGO", "guava"]
 
-# one way to avoid this is cloning the element
+# one way to avoid this is cloning each element, instead of array
 >> foo = fruits[0].clone
 => "apple"
 >> foo[0] = 'A'
 => "A"
->> foo
-=> "Apple"
 >> fruits
 => ["apple", "MANGO", "guava"]
+# map is covered later in the chapter
+# cloning all the elements
+>> fruits_copy = fruits.map(&:clone)
 ```
 
-* using `Marshal` module is one way to create a copy of array without worrying if it is a nested array or contains mutable objects
+* using `Marshal` module is one way to create a copy of array without worrying if it contains mutable objects
 * See [ruby-doc: Marshal](https://ruby-doc.org/core-2.5.0/Marshal.html) for caveats
 
 ```ruby
@@ -287,4 +288,85 @@ IndexError (index 2 outside of array bounds: -2...2)
 >> foo
 => [42, [12, 5, 63], ["foo", [7, 6]]]
 ```
+
+<br>
+
+## <a name="looping"></a>Looping
+
+* for loop
+
+```ruby
+>> numbers = [2, 12, 3, 25, 624, 21, 5, 9, 12]
+=> [2, 12, 3, 25, 624, 21, 5, 9, 12]
+
+>> for num in numbers
+>>   puts num if num%2 == 0
+>> end
+2
+12
+624
+12
+=> [2, 12, 3, 25, 624, 21, 5, 9, 12]
+```
+
+* using blocks with array methods
+
+```ruby
+>> fruits = %w[apple mango guava orange]
+=> ["apple", "mango", "guava", "orange"]
+
+>> fruits.each { |f| puts f }
+apple
+mango
+guava
+orange
+=> ["apple", "mango", "guava", "orange"]
+
+>> fruits.reverse_each do |f|
+?>   puts f
+>> end
+orange
+guava
+mango
+apple
+=> ["apple", "mango", "guava", "orange"]
+```
+
+* if index is needed
+
+```ruby
+>> books = %w[Elantris Martian Dune Alchemist]
+=> ["Elantris", "Martian", "Dune", "Alchemist"]
+
+>> books.each_index { |i| puts "#{i+1}) #{books[i]}" }
+1) Elantris
+2) Martian
+3) Dune
+4) Alchemist
+=> ["Elantris", "Martian", "Dune", "Alchemist"]
+
+>> books.each_with_index { |b, i| puts "#{i+1}) #{b}" }
+1) Elantris
+2) Martian
+3) Dune
+4) Alchemist
+=> ["Elantris", "Martian", "Dune", "Alchemist"]
+```
+
+* iterating over two or more arrays simultaneously
+* if lengths of arrays are different, `nil` is used to fill absent values
+
+```ruby
+>> odd = [1, 3, 5]
+=> [1, 3, 5]
+>> even = [2, 4, 6]
+=> [2, 4, 6]
+
+>> odd.zip(even) { |i, j| puts "#{i} #{j}" }
+1 2
+3 4
+5 6
+=> nil
+```
+
 
