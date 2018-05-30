@@ -6,6 +6,7 @@
 * [Slicing](#slicing)
 * [Copying](#copying)
 * [Looping](#looping)
+* [Modifying elements](#modifying-elements)
 
 <br>
 
@@ -96,7 +97,7 @@ IndexError (index 2 outside of array bounds: -2...2)
 
 * arrays can also be created using `new` method of Array class
 * helpful to initialize the array with same default value
-* See [ruby-doc: Array](https://ruby-doc.org/core-2.5.0/Array.html) for details
+* See [ruby-doc: Array](https://ruby-doc.org/core-2.5.0/Array.html) for details and caveats
 
 ```ruby
 >> nums = Array.new(5, 0)
@@ -309,7 +310,7 @@ IndexError (index 2 outside of array bounds: -2...2)
 => [2, 12, 3, 25, 624, 21, 5, 9, 12]
 ```
 
-* using blocks with array methods
+* array methods
 
 ```ruby
 >> fruits = %w[apple mango guava orange]
@@ -351,6 +352,14 @@ apple
 3) Dune
 4) Alchemist
 => ["Elantris", "Martian", "Dune", "Alchemist"]
+
+>> numbers = [2, 12, 3, 25, 624, 21, 5, 9, 12]
+=> [2, 12, 3, 25, 624, 21, 5, 9, 12]
+>> (0...numbers.length).step(3) { |i| puts numbers[i] }
+2
+25
+5
+=> 0...9
 ```
 
 * iterating over two or more arrays simultaneously
@@ -367,6 +376,53 @@ apple
 3 4
 5 6
 => nil
+```
+
+<br>
+
+## <a name="modifying-elements"></a>Modifying elements
+
+* using slicing
+
+```ruby
+>> books = %w[Dune Martian]
+=> ["Dune", "Martian"]
+
+>> books[0] = 'Harry Potter'
+=> "Harry Potter"
+>> books
+=> ["Harry Potter", "Martian"]
+
+# elements can be added beyond current length of array
+>> books[4] = 'Alchemist'
+=> "Alchemist"
+>> books
+=> ["Harry Potter", "Martian", nil, nil, "Alchemist"]
+
+>> books[2..3] = %w[Dune Elantris]
+=> ["Dune", "Elantris"]
+>> books
+=> ["Harry Potter", "Martian", "Dune", "Elantris", "Alchemist"]
+```
+
+* append method
+
+```ruby
+>> primes = [2, 3]
+=> [2, 3]
+>> primes.append(5)
+=> [2, 3, 5]
+>> primes.append(7, 11, 13)
+=> [2, 3, 5, 7, 11, 13]
+
+>> a = ['foo', 'baz']
+=> ["foo", "baz"]
+>> b = [2]
+=> [2]
+>> b.append(a)
+=> [2, ["foo", "baz"]]
+>> b.append(*a)
+=> [2, ["foo", "baz"], "foo", "baz"]
 ```
 
 
