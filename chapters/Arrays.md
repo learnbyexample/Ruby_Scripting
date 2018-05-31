@@ -405,7 +405,7 @@ apple
 => ["Harry Potter", "Martian", "Dune", "Elantris", "Alchemist"]
 ```
 
-* append method
+* `append` method
 
 ```ruby
 >> primes = [2, 3]
@@ -424,5 +424,88 @@ apple
 >> b.append(*a)
 => [2, ["foo", "baz"], "foo", "baz"]
 ```
+
+* deleting elements based on index
+
+```ruby
+>> primes = [2, 3, 5, 7, 11, 13, 17]
+=> [2, 3, 5, 7, 11, 13, 17]
+
+# single index
+>> primes.slice!(3)
+=> 7
+>> primes
+=> [2, 3, 5, 11, 13, 17]
+
+# range
+>> primes.slice!(1..3)
+=> [3, 5, 11]
+>> primes
+=> [2, 13, 17]
+
+# starting index and length
+>> primes.slice!(0, 2)
+=> [2, 13]
+>> primes
+=> [17]
+```
+
+* nested array example
+
+```ruby
+>> arr_2d = [[1, 3, 2, 10], [1.2, -0.2, 0, 2]]
+=> [[1, 3, 2, 10], [1.2, -0.2, 0, 2]]
+
+>> arr_2d[0].slice!(3)
+=> 10
+>> arr_2d
+=> [[1, 3, 2], [1.2, -0.2, 0, 2]]
+
+>> arr_2d.slice!(1)
+=> [1.2, -0.2, 0, 2]
+>> arr_2d
+=> [[1, 3, 2]]
+```
+
+* `pop` method - to delete element(s) from end of array
+* `clear` method - to delete all elements
+
+```ruby
+>> primes = [2, 3, 5, 7, 11]
+=> [2, 3, 5, 7, 11]
+
+>> primes.pop
+=> 11
+>> primes
+=> [2, 3, 5, 7]
+
+>> primes.pop(2)
+=> [5, 7]
+>> primes
+=> [2, 3]
+
+>> primes.clear
+=> []
+>> primes
+=> []
+```
+
+* deleting elements based on value
+
+```ruby
+>> nums = [1, 5, 2, 1, 3, 1, 2]
+=> [1, 5, 2, 1, 3, 1, 2]
+>> nums.delete(1)
+=> 1
+>> nums
+=> [5, 2, 3, 2]
+
+>> nums = nums - [2]
+=> [5, 3]
+
+>> nums.delete(12)
+=> nil
+```
+
 
 
