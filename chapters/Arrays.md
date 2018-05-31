@@ -7,6 +7,7 @@
 * [Copying](#copying)
 * [Looping](#looping)
 * [Modifying elements](#modifying-elements)
+* [Filtering](#filtering)
 
 <br>
 
@@ -490,22 +491,110 @@ apple
 => []
 ```
 
-* deleting elements based on value
+* deleting element(s) based on value(s)
 
 ```ruby
+# single value
 >> nums = [1, 5, 2, 1, 3, 1, 2]
 => [1, 5, 2, 1, 3, 1, 2]
 >> nums.delete(1)
 => 1
 >> nums
 => [5, 2, 3, 2]
-
->> nums = nums - [2]
-=> [5, 3]
-
 >> nums.delete(12)
 => nil
+
+# multiple values
+>> primes = [2, 3, 5, 7, 11]
+=> [2, 3, 5, 7, 11]
+>> primes = primes - [3]
+=> [2, 5, 7, 11]
+>> primes = primes - [7, 2]
+=> [5, 11]
 ```
+
+* inserting element(s)
+
+```ruby
+>> books = %w[Elantris Martian Dune]
+=> ["Elantris", "Martian", "Dune"]
+
+>> books.insert(1, 'Harry Potter')
+=> ["Elantris", "Harry Potter", "Martian", "Dune"]
+
+>> books.insert(3, 'Alchemist', 'Mort')
+=> ["Elantris", "Harry Potter", "Martian", "Alchemist", "Mort", "Dune"]
+```
+
+<br>
+
+## <a name="filtering"></a>Filtering
+
+* get index of an element based on value/condition
+
+```ruby
+>> nums = [1, 5, 2, 1, 3, 1, 2]
+=> [1, 5, 2, 1, 3, 1, 2]
+
+# based on value
+# first match
+>> nums.index(1)
+=> 0
+
+# last match
+>> nums.rindex(1)
+=> 5
+
+>> nums.index(12)
+=> nil
+
+# based on a condition
+>> nums.index { |n| n > 2 && n < 4 }
+=> 4
+>> nums.rindex { |n| n > 1 }
+=> 6
+```
+
+* get all values/index based on a condition
+
+```ruby
+>> nums = [1, 5, 2, 1, 3, 1, 2]
+=> [1, 5, 2, 1, 3, 1, 2]
+
+>> nums.select { |n| n > 2 }
+=> [5, 3]
+>> nums.each_index.select { |i| nums[i] > 2 }
+=> [1, 4]
+
+# select has opposite called reject, similar to if-unless
+>> nums.select { |n| n <= 2 }
+=> [1, 2, 1, 1, 2]
+>> nums.reject { |n| n > 2 }
+=> [1, 2, 1, 1, 2]
+
+# modifying array
+>> nums.select! { |n| n < 3 }
+=> [1, 2, 1, 1, 2]
+>> nums
+=> [1, 2, 1, 1, 2]
+```
+
+* randome value(s)
+
+```ruby
+>> primes = [2, 3, 5, 7, 11, 13, 17]
+=> [2, 3, 5, 7, 11, 13, 17]
+
+>> primes.sample
+=> 13
+>> primes.sample
+=> 7
+
+>> primes.sample(3)
+=> [2, 13, 3]
+```
+
+
 
 
 
