@@ -106,6 +106,10 @@ IndexError (index 2 outside of array bounds: -2...2)
 
 >> Array.new(2)
 => [nil, nil]
+
+# or use repetition operator
+>> nums = [0] * 5
+=> [0, 0, 0, 0, 0]
 ```
 
 <br>
@@ -426,6 +430,25 @@ apple
 => [2, ["foo", "baz"], "foo", "baz"]
 ```
 
+* concatenation operators
+
+```ruby
+>> primes = [2, 3]
+=> [2, 3]
+>> primes + [5]
+=> [2, 3, 5]
+>> primes + [5, 7, 11, 13]
+=> [2, 3, 5, 7, 11, 13]
+
+# in-place concatenation
+>> nums = [-5, 2]
+=> [-5, 2]
+>> nums << 42
+=> [-5, 2, 42]
+>> nums << ['foo', 'baz']
+=> [-5, 2, 42, ["foo", "baz"]]
+```
+
 * deleting elements based on index
 
 ```ruby
@@ -530,6 +553,26 @@ apple
 
 ## <a name="filtering"></a>Filtering
 
+* check if an element is present and how many times it is present
+
+```ruby
+>> books = %w[Elantris Martian Dune]
+=> ["Elantris", "Martian", "Dune"]
+>> books.include?('Dune')
+=> true
+>> books.include?('Alchemist')
+=> false
+
+>> nums = [15, 99, 19, 382, 43, 19]
+=> [15, 99, 19, 382, 43, 19]
+>> nums.count(99)
+=> 1
+>> nums.count(19)
+=> 2
+>> nums.count(23)
+=> 0
+```
+
 * get index of an element based on value/condition
 
 ```ruby
@@ -555,7 +598,7 @@ apple
 => 6
 ```
 
-* get all values/index based on a condition
+* get all elements/index based on a condition
 
 ```ruby
 >> nums = [1, 5, 2, 1, 3, 1, 2]
@@ -579,7 +622,7 @@ apple
 => [1, 2, 1, 1, 2]
 ```
 
-* randome value(s)
+* random element(s)
 
 ```ruby
 >> primes = [2, 3, 5, 7, 11, 13, 17]
