@@ -8,6 +8,7 @@
 * [Looping](#looping)
 * [Modifying elements](#modifying-elements)
 * [Filtering](#filtering)
+* [Sorting and company](#sorting-and-company)
 
 <br>
 
@@ -635,6 +636,72 @@ apple
 
 >> primes.sample(3)
 => [2, 13, 3]
+```
+
+<br>
+
+## <a name="sorting-and-company"></a>Sorting and company
+
+```ruby
+>> nums = [1, 5.3, 321, 0, 1, 2]
+=> [1, 5.3, 321, 0, 1, 2]
+>> nums.sort
+=> [0, 1, 1, 2, 5.3, 321]
+>> nums.sort.reverse
+=> [321, 5.3, 2, 1, 1, 0]
+
+>> ['good', 'foo', 'baz'].sort
+=> ["baz", "foo", "good"]
+
+>> [2, 'bad'].sort
+ArgumentError (comparison of Integer with String failed)
+
+# in-place sorting
+>> nums.sort!
+=> [0, 1, 1, 2, 5.3, 321]
+>> nums
+=> [0, 1, 1, 2, 5.3, 321]
+```
+
+* before we continue on more sorting stuff, let's see the `<=>` operator
+* it gives `1` if LHS is greater than RHS, `-1` if lesser than RHS and `0` if equal to RHS
+
+```ruby
+>> 4 <=> 2
+=> 1
+>> 4 <=> 20
+=> -1
+>> 4 <=> 4
+=> 0
+
+>> 'good' <=> 'bad'
+=> 1
+>> 'good' <=> 'tool'
+=> -1
+>> 'good' <=> 'good'
+=> 0
+```
+
+* to define a custom sorting operation, block expression has to return `1/-1/0` for comparison between two elements
+
+```ruby
+>> nums = [1, 5.3, 321, 0, 1, 2]
+=> [1, 5.3, 321, 0, 1, 2]
+# same as nums.sort
+>> nums.sort { |a, b| a <=> b }
+=> [0, 1, 1, 2, 5.3, 321]
+# same as nums.sort.reverse
+>> nums.sort { |a, b| b <=> a }
+=> [321, 5.3, 2, 1, 1, 0]
+
+>> nums = [1, 4, 5, 2, 51, 3, 6, 22]
+=> [1, 4, 5, 2, 51, 3, 6, 22]
+# bring even numbers to the front, keeping order intact
+>> nums.sort { |a, b| a%2 == 0 ? -1 : b%2 == 0 ? 1 : 0 }
+=> [4, 2, 6, 22, 1, 5, 51, 3]
+# bring odd numbers to the front, keeping order intact
+>> nums.sort { |a, b| a%2 == 1 ? -1 : b%2 == 1 ? 1 : 0 }
+=> [1, 5, 51, 3, 4, 2, 6, 22]
 ```
 
 
