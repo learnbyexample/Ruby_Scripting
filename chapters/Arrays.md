@@ -642,6 +642,8 @@ apple
 
 ## <a name="sorting-and-company"></a>Sorting and company
 
+* default sort
+
 ```ruby
 >> nums = [1, 5.3, 321, 0, 1, 2]
 => [1, 5.3, 321, 0, 1, 2]
@@ -694,6 +696,11 @@ ArgumentError (comparison of Integer with String failed)
 >> nums.sort { |a, b| b <=> a }
 => [321, 5.3, 2, 1, 1, 0]
 
+>> words = %w[fuliginous crusado morello irk seam]
+=> ["fuliginous", "crusado", "morello", "irk", "seam"]
+>> words.sort { |a, b| a.length <=> b.length }
+=> ["irk", "seam", "crusado", "morello", "fuliginous"]
+
 >> nums = [1, 4, 5, 2, 51, 3, 6, 22]
 => [1, 4, 5, 2, 51, 3, 6, 22]
 # bring even numbers to the front, keeping order intact
@@ -704,7 +711,55 @@ ArgumentError (comparison of Integer with String failed)
 => [1, 5, 51, 3, 4, 2, 6, 22]
 ```
 
+* use array to define one or more tie-breaker conditions
 
+```ruby
+>> words = %w[foo bad good teal nice how]
+=> ["foo", "bad", "good", "teal", "nice", "how"]
 
+# foo/bad/how have same length of 3
+# by default, their order will be same as in input array
+>> words.sort { |a, b| a.length <=> b.length }
+=> ["foo", "bad", "how", "good", "teal", "nice"]
+# one or more tie-breakers can be defined for such cases
+>> words.sort { |a, b| [a.length, a] <=> [b.length, b] }
+=> ["bad", "foo", "how", "good", "nice", "teal"]
+
+# negating will give reverse order for methods returning a numeric value
+# here, we get longer words first, ascending alphabetic order as tie-breaker
+>> words.sort { |a, b| [-a.length, a] <=> [-b.length, b] }
+=> ["good", "nice", "teal", "bad", "foo", "how"]
+# here, we get longer words first, descending alphabetic order as tie-breaker
+>> words.sort { |a, b| [-a.length, b] <=> [-b.length, a] }
+=> ["teal", "nice", "good", "how", "foo", "bad"]
+```
+
+* often, sorting is required based on a method applied to each element of array
+    * for ex: sorting words in an array by length of the word
+* in such cases, use `sort_by` for simpler syntax
+* which can further be shortened by using `&` operator and method's symbol
+    * See also [stackoverflow: What does &:name mean in Ruby?](https://stackoverflow.com/questions/1217088/what-does-mapname-mean-in-ruby)
+* to debug an issue with `sort_by`, replace it with `map` - that would show the mapping based on which you are trying to sort the array
+
+```ruby
+>> words = %w[foo bad good teal nice how]
+=> ["foo", "bad", "good", "teal", "nice", "how"]
+>> words.sort_by { |w| w.length }
+=> ["foo", "bad", "how", "good", "teal", "nice"]
+>> words.sort_by { |w| [w.length, w] }
+=> ["bad", "foo", "how", "good", "nice", "teal"]
+
+# use map instead of sort_by for debugging/working on a solution
+>> ['foo1', 'foo21', 'foo3'].map { |s| s.split('foo')[1].to_i }
+=> [1, 21, 3]
+>> ['foo1', 'foo21', 'foo3'].sort_by { |s| s.split('foo')[1].to_i }
+=> ["foo1", "foo3", "foo21"]
+
+>> str_nums = %w[4.3 55 -42 64]
+=> ["4.3", "55", "-42", "64"]
+# same as str_nums.sort_by { |s| s.to_f }
+>> str_nums.sort_by(&:to_f)
+=> ["-42", "4.3", "55", "64"]
+```
 
 
