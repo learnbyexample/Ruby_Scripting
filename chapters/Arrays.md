@@ -685,6 +685,7 @@ ArgumentError (comparison of Integer with String failed)
 ```
 
 * to define a custom sorting operation, block expression has to return `1/-1/0` for comparison between two elements
+    * `1` and `-1` can be any positive and negative number respectively
 
 ```ruby
 >> nums = [1, 5.3, 321, 0, 1, 2]
@@ -761,5 +762,69 @@ ArgumentError (comparison of Integer with String failed)
 >> str_nums.sort_by(&:to_f)
 => ["-42", "4.3", "55", "64"]
 ```
+
+* `min` and `max` values
+* kinda syntactical sugar for `sort` method
+
+```ruby
+>> nums = [431, 4, 5, -2, 51, 3, 6, -22]
+=> [431, 4, 5, -2, 51, 3, 6, -22]
+
+>> nums.sort[0]
+=> -22
+>> nums.min
+=> -22
+>> nums.sort[0, 2]
+=> [-22, -2]
+>> nums.min(2)
+=> [-22, -2]
+
+>> nums.sort[-1]
+=> 431
+>> nums.max
+=> 431
+>> nums.sort { |a, b| b <=> a }[0, 3]
+=> [431, 51, 6]
+>> nums.max(3)
+=> [431, 51, 6]
+```
+
+* block can be passed as well
+
+```ruby
+>> words = %w[fuliginous crusado Morello Irk seam]
+=> ["fuliginous", "crusado", "Morello", "Irk", "seam"]
+>> words.min
+=> "Irk"
+>> words.min { |a, b| a.upcase <=> b.upcase }
+=> "crusado"
+
+>> words.max(2) { |a, b| a.upcase <=> b.upcase }
+=> ["seam", "Morello"]
+
+# nice way to obfuscate code ;)
+>> words.max(2) { |a, b| b.upcase <=> a.upcase }
+=> ["crusado", "fuliginous"]
+```
+
+* removing duplicate entries from array
+
+```ruby
+>> chars = ["3", "b", "a", "c", "d", "1", "d", "c", "2", "3", "1", "b"]
+=> ["3", "b", "a", "c", "d", "1", "d", "c", "2", "3", "1", "b"]
+# unique entries will be in same order as in original array
+>> chars.uniq
+=> ["3", "b", "a", "c", "d", "1", "2"]
+
+>> [3, -2, 4, 1, -3, -4].uniq { |n| n.abs }
+=> [3, -2, 4, 1]
+>> [3, -2, 4, 1, -3, -4].uniq(&:abs)
+=> [3, -2, 4, 1]
+```
+
+
+
+
+
 
 
