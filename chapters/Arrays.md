@@ -9,6 +9,8 @@
 * [Modifying elements](#modifying-elements)
 * [Filtering](#filtering)
 * [Sorting and company](#sorting-and-company)
+* [Transforming whole array](#transforming-whole-array)
+* [Miscellaneous](#miscellaneous)
 
 <br>
 
@@ -98,20 +100,27 @@ IndexError (index 2 outside of array bounds: -2...2)
 ```
 
 * arrays can also be created using `new` method of Array class
-* helpful to initialize the array with same default value
-* See [ruby-doc: Array](https://ruby-doc.org/core-2.5.0/Array.html) for details and caveats
+    * helpful to initialize the array with same default value
+* `range/step` etc can be converted to array using the `to_a` method
 
 ```ruby
 >> nums = Array.new(5, 0)
+=> [0, 0, 0, 0, 0]
+# or use repetition operator
+>> nums = [0] * 5
 => [0, 0, 0, 0, 0]
 
 >> Array.new(2)
 => [nil, nil]
 
-# or use repetition operator
->> nums = [0] * 5
-=> [0, 0, 0, 0, 0]
+>> nums = 2.step(31, 6).to_a
+=> [2, 8, 14, 20, 26]
 ```
+
+**Further Reading**
+
+* [ruby-doc: Array](https://ruby-doc.org/core-2.5.0/Array.html)
+* [ruby-doc: Enumerable](https://ruby-doc.org/core-2.5.0/Enumerable.html)
 
 <br>
 
@@ -204,14 +213,16 @@ IndexError (index 2 outside of array bounds: -2...2)
 ## <a name="copying"></a>Copying
 
 * arrays are mutable like strings
-* when a variable is assigned to another variable or passed as argument to a method, only the variable's reference is used
-* so, copying an array will result in two variables pointing to same object
+* so, assigning an array variable to another will result in both variables pointing to same object
+* use `equal?` method to check if two variables are references to same object
 
 ```ruby
 >> nums = [3, 61]
 => [3, 61]
 >> nums_copy = nums
 => [3, 61]
+>> nums_copy.equal?(nums)
+=> true
 
 >> nums_copy[0] = 'foo'
 => "foo"
@@ -219,59 +230,98 @@ IndexError (index 2 outside of array bounds: -2...2)
 => ["foo", 61]
 >> nums
 => ["foo", 61]
+```
 
+* passing a variable to a method will have same effect as above example
+
+```ruby
 >> def foo(a)
 >>   a[1] = 'baz'
 >> end
 => :foo
+
+>> nums = [1, 2, 3]
+=> [1, 2, 3]
 >> foo(nums)
 => "baz"
 >> nums
-=> ["foo", "baz"]
->> nums_copy
-=> ["foo", "baz"]
+=> [1, "baz", 3]
 ```
 
-* as long as each object of the array is immutable, clone or slice of the array cannot affect the original array
+* assigning an element of array clone to new value won't affect the original array irrespective of mutability
 
 ```ruby
->> nums = [3, 61]
-=> [3, 61]
->> nums_copy = nums.clone
-=> [3, 61]
+>> a = [1, 'good']
+=> [1, "good"]
+>> b = a.clone
+=> [1, "good"]
 
->> nums_copy[0] = 'foo'
-=> "foo"
->> nums_copy
-=> ["foo", 61]
->> nums
-=> [3, 61]
+>> a.equal?(b)
+=> false
+>> a[1].equal?(b[1])
+=> true
+
+>> b[0] = 42
+=> 42
+>> b[1] = 'bad'
+=> "bad"
+>> b
+=> [42, "bad"]
+>> a
+=> [1, "good"]
 ```
 
-* if array contains mutable objects like string or another array, a clone or its slice will affect the original array as well
+* modifying a mutable element of array clone will affect the original array as well
 
 ```ruby
 >> fruits = %w[apple mango guava]
 => ["apple", "mango", "guava"]
->> my_fruit = fruits[1]
-=> "mango"
->> my_fruit.upcase!
-=> "MANGO"
->> fruits
-=> ["apple", "MANGO", "guava"]
+>> fruits_copy = fruits.clone
+=> ["apple", "mango", "guava"]
 
-# one way to avoid this is cloning each element, instead of array
->> foo = fruits[0].clone
-=> "apple"
->> foo[0] = 'A'
+>> fruits_copy.equal?(fruits)
+=> false
+>> fruits_copy[0].equal?(fruits[0])
+=> true
+
+>> fruits_copy[0][0] = 'A'
 => "A"
+>> fruits_copy
+=> ["Apple", "mango", "guava"]
 >> fruits
-=> ["apple", "MANGO", "guava"]
-# map is covered later in the chapter
-# cloning all the elements
->> fruits_copy = fruits.map(&:clone)
+=> ["Apple", "mango", "guava"]
 ```
 
+* one way to avoid this is cloning each element needed, instead of cloning the array
+
+```ruby
+>> fruits = %w[apple mango guava]
+=> ["apple", "mango", "guava"]
+
+>> my_fruit = fruits[0].clone
+=> "apple"
+>> my_fruit.equal?(fruits[0])
+=> false
+
+>> my_fruit[0] = 'A'
+=> "A"
+>> my_fruit
+=> "Apple"
+>> fruits
+=> ["apple", "mango", "guava"]
+
+# cloning all the elements
+# map/zip is covered later in the chapter
+>> fruits_copy = fruits.map(&:clone)
+=> ["apple", "mango", "guava"]
+>> fruits_copy.zip(fruits) { |i, j| puts i.equal?(j) }
+false
+false
+false
+=> nil
+```
+
+* however, above solution would fail if an element is nested array and other cases 
 * using `Marshal` module is one way to create a copy of array without worrying if it contains mutable objects
 * See [ruby-doc: Marshal](https://ruby-doc.org/core-2.5.0/Marshal.html) for caveats
 
@@ -799,6 +849,9 @@ ArgumentError (comparison of Integer with String failed)
 >> words.min { |a, b| a.upcase <=> b.upcase }
 => "crusado"
 
+>> words.max { |a, b| a.length <=> b.length }
+=> "fuliginous"
+
 >> words.max(2) { |a, b| a.upcase <=> b.upcase }
 => ["seam", "Morello"]
 
@@ -822,8 +875,101 @@ ArgumentError (comparison of Integer with String failed)
 => [3, -2, 4, 1]
 ```
 
+<br>
 
+## <a name="transforming-whole-array"></a>Transforming whole array
 
+* we've seen some examples of transforming in previous sections
+* `shuffle` will randomize array elements
+    * use `shuffle!` for in-place modification
+
+```ruby
+>> nums = [23, 756, -983, 5, 42, 13]
+=> [23, 756, -983, 5, 42, 13]
+>> nums.shuffle
+=> [13, 23, 756, 42, 5, -983]
+```
+
+* `map` allows to define a transformation function for each array element
+    * use `map!` for in-place transformation
+* multiple statements can be used inside the block, value of last expression will be used to replace the element
+
+```ruby
+>> nums = [3, -2, 4, 1, -78, -42]
+=> [3, -2, 4, 1, -78, -42]
+>> nums.map(&:abs)
+=> [3, 2, 4, 1, 78, 42]
+>> nums.map { |n| n**2 }.sum
+=> 7878
+
+>> words = %w[fuliginous crusado Morello Irk seam]
+=> ["fuliginous", "crusado", "Morello", "Irk", "seam"]
+# downcase and shuffle each string element
+# multiline version for illustration
+>> words.map do |w|
+?>   arr = w.downcase.chars
+>>   arr.shuffle.join
+>> end
+=> ["nsfguuiilo", "rsdoauc", "orllemo", "ikr", "eams"]
+# single line version
+>> words.map { |w| w.downcase.chars.shuffle.join }
+=> ["lfiguniosu", "coadsur", "oollrme", "rik", "asem"]
+```
+
+<br>
+
+## <a name="miscellaneous"></a>Miscellaneous
+
+* `reduce` allows to apply a transformation between elements of the array to get single output value
+    * a few variables/methods in Ruby have aliases, `reduce` has one as `inject`
+* See [ruby-doc: reduce](https://ruby-doc.org/core-2.5.0/Enumerable.html#method-i-reduce) for details
+
+```ruby
+>> nums = [3, -2, 4, 1, -78, -42]
+=> [3, -2, 4, 1, -78, -42]
+>> nums.sum
+=> -114
+>> nums.reduce(:+)
+=> -114
+>> nums.reduce(:*)
+=> -78624
+
+# supplying an initial value
+>> nums.reduce(100, :+)
+=> -14
+>> nums.reduce(2, :*)
+=> -157248
+
+# here 0 is initial value
+# op is name of accumulator, which gets the initial value
+# and n gets each element of the array
+>> nums.reduce(0) { |op, n| op + n**2 }
+=> 7878
+```
+
+* `all?` returns `true` if all conditions are `true`
+* `any?` returns `true` if at least one condition is `true`
+
+```ruby
+>> nums = [4, 2, 51]
+=> [4, 2, 51]
+>> nums.all? { |n| n%2 == 0 }
+=> false
+>> nums.any? { |n| n%2 == 0 }
+=> true
+
+# if array elements themselves are used as conditions
+# only nil and false values evaluate to false, rest all are true conditions
+>> [0, 1, -1, ""].all?
+=> true
+>> [0, 1, -1, "", false].all?
+=> false
+>> [0, 1, -1, "", nil].all?
+=> false
+
+>> [].any?
+=> false
+```
 
 
 
