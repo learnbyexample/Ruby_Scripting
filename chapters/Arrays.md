@@ -321,7 +321,7 @@ false
 => nil
 ```
 
-* however, above solution would fail if an element is nested array and other cases 
+* however, above solution would fail for nested arrays and other cases 
 * using `Marshal` module is one way to create a copy of array without worrying if it contains mutable objects
 * See [ruby-doc: Marshal](https://ruby-doc.org/core-2.5.0/Marshal.html) for caveats
 
@@ -481,7 +481,7 @@ apple
 => [2, ["foo", "baz"], "foo", "baz"]
 ```
 
-* concatenation operators
+* concatenation
 
 ```ruby
 >> primes = [2, 3]
@@ -498,6 +498,10 @@ apple
 => [-5, 2, 42]
 >> nums << ['foo', 'baz']
 => [-5, 2, 42, ["foo", "baz"]]
+
+# same as: nums.append(*primes)
+>> nums.concat(primes)
+=> [-5, 2, 42, ["foo", "baz"], 2, 3]
 ```
 
 * deleting elements based on index
@@ -740,10 +744,10 @@ ArgumentError (comparison of Integer with String failed)
 ```ruby
 >> nums = [1, 5.3, 321, 0, 1, 2]
 => [1, 5.3, 321, 0, 1, 2]
-# same as nums.sort
+# same as: nums.sort
 >> nums.sort { |a, b| a <=> b }
 => [0, 1, 1, 2, 5.3, 321]
-# same as nums.sort.reverse
+# same as: nums.sort.reverse
 >> nums.sort { |a, b| b <=> a }
 => [321, 5.3, 2, 1, 1, 0]
 
@@ -808,7 +812,7 @@ ArgumentError (comparison of Integer with String failed)
 
 >> str_nums = %w[4.3 55 -42 64]
 => ["4.3", "55", "-42", "64"]
-# same as str_nums.sort_by { |s| s.to_f }
+# same as: str_nums.sort_by { |s| s.to_f }
 >> str_nums.sort_by(&:to_f)
 => ["-42", "4.3", "55", "64"]
 ```
@@ -880,7 +884,7 @@ ArgumentError (comparison of Integer with String failed)
 ## <a name="transforming-whole-array"></a>Transforming whole array
 
 * we've seen some examples of transforming in previous sections
-* `shuffle` will randomize array elements
+* `shuffle` will randomize order of array elements
     * use `shuffle!` for in-place modification
 
 ```ruby
@@ -959,7 +963,7 @@ ArgumentError (comparison of Integer with String failed)
 => true
 
 # if array elements themselves are used as conditions
-# only nil and false values evaluate to false, rest all are true conditions
+# only nil and false values evaluate to false, others are true conditions
 >> [0, 1, -1, ""].all?
 => true
 >> [0, 1, -1, "", false].all?
@@ -971,6 +975,44 @@ ArgumentError (comparison of Integer with String failed)
 => false
 ```
 
+* `flatten` method will convert nested arrays to one-dimensional array
+    * optional argument allows to limit level of flattening
+* `compact` method will remove all `nil` elements from the array
+    * `nil` values within nested array won't be removed
+* append `!` to these methods for in-place modification
 
+```ruby
+>> foo = [42, [12, 5, 63], ['foo', [7, 6]]]
+=> [42, [12, 5, 63], ["foo", [7, 6]]]
+>> foo.flatten
+=> [42, 12, 5, 63, "foo", 7, 6]
+>> foo.flatten(1)
+=> [42, 12, 5, 63, "foo", [7, 6]]
 
+>> baz = [42, 'good', nil, 7, nil, 'nice']
+=> [42, "good", nil, 7, nil, "nice"]
+>> baz.compact
+=> [42, "good", 7, "nice"]
+```
+
+* `&` operator will return common elements between two arrays
+* `|` operator will return union of two arrays
+* this is similar to set union, there won't be duplicate elements in output
+
+```ruby
+>> nums = [3, 2, 4, 1, 78, 42]
+=> [3, 2, 4, 1, 78, 42]
+>> primes = [2, 3, 5, 7, 11, 13, 17]
+=> [2, 3, 5, 7, 11, 13, 17]
+
+>> nums & primes
+=> [3, 2]
+>> primes & nums
+=> [2, 3]
+
+>> nums | primes
+=> [3, 2, 4, 1, 78, 42, 5, 7, 11, 13, 17]
+>> primes | nums
+=> [2, 3, 5, 7, 11, 13, 17, 4, 1, 78, 42]
+```
 
