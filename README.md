@@ -28,6 +28,7 @@
 * [Executing external commands](./chapters/Executing_external_commands.md)
     * [Issuing commands](./chapters/Executing_external_commands.md#issuing-commands), [Saving command output](./chapters/Executing_external_commands.md#saving-command-output)
 * [Arrays](./chapters/Arrays.md)
+    * [Assignment and Indexing](./chapters/Arrays.md#assignment-and-indexing), [Slicing](./chapters/Arrays.md#slicing), [Copying](./chapters/Arrays.md#copying), [Looping](./chapters/Arrays.md#looping), [Modifying elements](./chapters/Arrays.md#modifying-elements), [Filtering](./chapters/Arrays.md#filtering), [Sorting and company](./chapters/Arrays.md#sorting-and-company), [Transforming whole array](./chapters/Arrays.md#transforming-whole-array), [Miscellaneous](./chapters/Arrays.md#miscellaneous), [Getting Array as user input](./chapters/Arrays.md#getting-array-as-user-input)
 * [Exercises](./chapters/Exercises.md)
 
 <br>
