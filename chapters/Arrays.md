@@ -121,6 +121,8 @@ IndexError (index 2 outside of array bounds: -2...2)
 
 * [ruby-doc: Array](https://ruby-doc.org/core-2.5.0/Array.html)
 * [ruby-doc: Enumerable](https://ruby-doc.org/core-2.5.0/Enumerable.html)
+    * Array is enumerable, so all Enumerable methods are applicable to Array objects as well
+    * If any method mentioned in this chapter is not found in Array docs, check under Enumerable docs
 
 <br>
 
@@ -366,7 +368,7 @@ false
 => [2, 12, 3, 25, 624, 21, 5, 9, 12]
 ```
 
-* array methods
+* using array methods
 
 ```ruby
 >> fruits = %w[apple mango guava orange]
@@ -653,12 +655,14 @@ apple
 => 6
 ```
 
-* get all elements/index based on a condition
+* get first element or all elements/indices based on a condition
 
 ```ruby
 >> nums = [1, 5, 2, 1, 3, 1, 2]
 => [1, 5, 2, 1, 3, 1, 2]
 
+>> nums.find { |n| n > 2 }
+=> 5
 >> nums.select { |n| n > 2 }
 => [5, 3]
 >> nums.each_index.select { |i| nums[i] > 2 }
@@ -670,7 +674,7 @@ apple
 >> nums.reject { |n| n > 2 }
 => [1, 2, 1, 1, 2]
 
-# modifying array
+# in-place modification
 >> nums.select! { |n| n < 3 }
 => [1, 2, 1, 1, 2]
 >> nums
@@ -792,6 +796,7 @@ ArgumentError (comparison of Integer with String failed)
 * often, sorting is required based on a method applied to each element of array
     * for ex: sorting words in an array by length of the word
 * in such cases, use `sort_by` for simpler syntax
+    * See [ruby-doc: sort_by](https://ruby-doc.org/core-2.5.0/Enumerable.html#method-i-sort_by) for details on performance considerations
 * which can further be shortened by using `&` operator and method's symbol
     * See also [stackoverflow: What does &:name mean in Ruby?](https://stackoverflow.com/questions/1217088/what-does-mapname-mean-in-ruby)
 * to debug an issue with `sort_by`, replace it with `map` - that would show the mapping based on which you are trying to sort the array
@@ -848,20 +853,39 @@ ArgumentError (comparison of Integer with String failed)
 ```ruby
 >> words = %w[fuliginous crusado Morello Irk seam]
 => ["fuliginous", "crusado", "Morello", "Irk", "seam"]
->> words.min
-=> "Irk"
+
 >> words.min { |a, b| a.upcase <=> b.upcase }
+=> "crusado"
+>> words.min_by(&:upcase)
 => "crusado"
 
 >> words.max { |a, b| a.length <=> b.length }
 => "fuliginous"
+>> words.max_by(&:length)
+=> "fuliginous"
 
->> words.max(2) { |a, b| a.upcase <=> b.upcase }
+>> words.max_by(2) { |w| w.upcase }
 => ["seam", "Morello"]
 
 # nice way to obfuscate code ;)
 >> words.max(2) { |a, b| b.upcase <=> a.upcase }
 => ["crusado", "fuliginous"]
+```
+
+* to get both min and max values in one shot
+
+```ruby
+>> nums = [431, 4, 5, -2, 51, 3, 6, -22]
+=> [431, 4, 5, -2, 51, 3, 6, -22]
+>> nums.minmax
+=> [-22, 431]
+
+>> words = %w[fuliginous crusado Morello Irk seam]
+=> ["fuliginous", "crusado", "Morello", "Irk", "seam"]
+>> words.minmax { |a, b| a.upcase <=> b.upcase }
+=> ["crusado", "seam"]
+>> words.minmax_by(&:upcase)
+=> ["crusado", "seam"]
 ```
 
 * removing duplicate entries from array
@@ -953,14 +977,20 @@ ArgumentError (comparison of Integer with String failed)
 
 * `all?` returns `true` if all conditions are `true`
 * `any?` returns `true` if at least one condition is `true`
+* `none?` returns `true` if all conditions are `false`
+* `one?` returns `true` if exactly one condition is `true`
 
 ```ruby
 >> nums = [4, 2, 51]
 => [4, 2, 51]
 >> nums.all? { |n| n%2 == 0 }
 => false
+>> nums.all?(Integer)
+=> true
 >> nums.any? { |n| n%2 == 0 }
 => true
+>> nums.any?(String)
+=> false
 
 # if array elements themselves are used as conditions
 # only nil and false values evaluate to false, others are true conditions
@@ -997,7 +1027,7 @@ ArgumentError (comparison of Integer with String failed)
 
 * `&` operator will return common elements between two arrays
 * `|` operator will return union of two arrays
-* this is similar to set union, there won't be duplicate elements in output
+* these are similar to set operations, there won't be duplicate elements in output
 
 ```ruby
 >> nums = [3, 2, 4, 1, 78, 42]
@@ -1015,4 +1045,27 @@ ArgumentError (comparison of Integer with String failed)
 >> primes | nums
 => [2, 3, 5, 7, 11, 13, 17, 4, 1, 78, 42]
 ```
+
+* use `rotate` to rotate the array clockwise or anti-clockwise
+    * use `rotate!` for in-place modification
+* `transpose` will change rows to columns and vice versa, length of sub-arrays should be same
+    * no in-place modification, have to manually re-assign if needed
+
+```ruby
+>> primes = [2, 3, 5, 7, 11, 13, 17]
+=> [2, 3, 5, 7, 11, 13, 17]
+>> primes.rotate
+=> [3, 5, 7, 11, 13, 17, 2]
+>> primes.rotate(2)
+=> [5, 7, 11, 13, 17, 2, 3]
+>> primes.rotate(-2)
+=> [13, 17, 2, 3, 5, 7, 11]
+
+>> nums = [[42, 4], [5, 63], [3, 7]]
+=> [[42, 4], [5, 63], [3, 7]]
+>> nums.transpose
+=> [[42, 5, 3], [4, 63, 7]]
+```
+
+
 
