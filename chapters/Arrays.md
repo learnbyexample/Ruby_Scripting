@@ -11,6 +11,7 @@
 * [Sorting and company](#sorting-and-company)
 * [Transforming whole array](#transforming-whole-array)
 * [Miscellaneous](#miscellaneous)
+* [Getting Array as user input](#getting-array-as-user-input)
 
 <br>
 
@@ -115,6 +116,37 @@ IndexError (index 2 outside of array bounds: -2...2)
 
 >> nums = 2.step(31, 6).to_a
 => [2, 8, 14, 20, 26]
+```
+
+* multiple variable assignment
+* See also [ruby-doc: Array to Arguments Conversion](https://ruby-doc.org/core-2.5.0/doc/syntax/calling_methods_rdoc.html#label-Array+to+Arguments+Conversion)
+
+```ruby
+>> a, b = [2, 42]
+=> [2, 42]
+>> a
+=> 2
+>> b
+=> 42
+
+# [] is optional
+>> a, b = b, a
+=> [42, 2]
+>> a
+=> 42
+>> b
+=> 2
+
+>> nums = [3, 12, 17, 25, 100]
+=> [3, 12, 17, 25, 100]
+>> a, *b, c = nums
+=> [3, 12, 17, 25, 100]
+>> a
+=> 3
+>> b
+=> [12, 17, 25]
+>> c
+=> 100
 ```
 
 **Further Reading**
@@ -681,6 +713,22 @@ apple
 => [1, 2, 1, 1, 2]
 ```
 
+* use `partition` to get both matching and non-matching elements
+
+```ruby
+>> nums = [1, 5, 2, 1, 3, 1, 2]
+=> [1, 5, 2, 1, 3, 1, 2]
+>> nums.partition { |n| n > 2 }
+=> [[5, 3], [1, 2, 1, 1, 2]]
+
+>> gt2, lt2 = nums.partition { |n| n > 2 }
+=> [[5, 3], [1, 2, 1, 1, 2]]
+>> gt2
+=> [5, 3]
+>> lt2
+=> [1, 2, 1, 1, 2]
+```
+
 * random element(s)
 
 ```ruby
@@ -975,6 +1023,25 @@ ArgumentError (comparison of Integer with String failed)
 => 7878
 ```
 
+* `sum` accepts an initial value and block too
+
+```ruby
+>> nums = [3, -2, 4, 1, -78, -42]
+=> [3, -2, 4, 1, -78, -42]
+# same as: nums.reduce(0) { |op, n| op + n**2 }
+>> nums.sum { |n| n**2 }
+=> 7878
+>> nums.sum(10000) { |n| n**2 }
+=> 17878
+
+>> p1 = [1, 3, 5]
+=> [1, 3, 5]
+>> p2 = [3, 214, 53]
+=> [3, 214, 53]
+>> p1.zip(p2).sum { |i, j| i * j }
+=> 910
+```
+
 * `all?` returns `true` if all conditions are `true`
 * `any?` returns `true` if at least one condition is `true`
 * `none?` returns `true` if all conditions are `false`
@@ -1067,5 +1134,48 @@ ArgumentError (comparison of Integer with String failed)
 => [[42, 5, 3], [4, 63, 7]]
 ```
 
+<br>
 
+## <a name="getting-array-as-user-input"></a>Getting Array as user input
+
+* `gets` will always get a string from user
+* when array input is needed, one way is to ask the user to separate the elements with a delimiter and then use `split+map`
+    * assuming elements of same data type
+
+```ruby
+>> puts 'Enter array elements separated by space'
+Enter array elements separated by space
+=> nil
+>> usr_ip = gets
+32 -5 43 65
+=> "32 -5 43 65\n"
+>> nums = usr_ip.split.map(&:to_i)
+=> [32, -5, 43, 65]
+
+>> puts 'Enter words separated by colon'
+Enter words separated by colon
+=> nil
+>> usr_ip = gets.chomp
+foo:baz:123:good
+=> "foo:baz:123:good"
+>> words = usr_ip.split(':')
+=> ["foo", "baz", "123", "good"]
+```
+
+* another way is to ask the user to use Array syntax and let Ruby interpret it
+* **Note:** use this method only if you can trust the user input or have some means of preventing malicious use
+
+```ruby
+>> nums = eval(gets)
+[2, 3, 5, 7]
+=> [2, 3, 5, 7]
+>> nums
+=> [2, 3, 5, 7]
+
+>> fruits = eval(gets)
+%w[apple mango orange]
+=> ["apple", "mango", "orange"]
+>> fruits
+=> ["apple", "mango", "orange"]
+```
 
