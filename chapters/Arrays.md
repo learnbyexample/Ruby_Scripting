@@ -114,6 +114,12 @@ IndexError (index 2 outside of array bounds: -2...2)
 >> Array.new(2)
 => [nil, nil]
 
+# to avoid same mutable object as default, use the block form
+>> a = Array.new(5) { 'foo' }
+=> ["foo", "foo", "foo", "foo", "foo"]
+>> a[0].equal?(a[1])
+=> false
+
 >> nums = 2.step(31, 6).to_a
 => [2, 8, 14, 20, 26]
 ```
@@ -999,6 +1005,7 @@ ArgumentError (comparison of Integer with String failed)
 * `reduce` allows to apply a transformation between elements of the array to get single output value
     * a few variables/methods in Ruby have aliases, `reduce` has one as `inject`
 * See [ruby-doc: reduce](https://ruby-doc.org/core-2.5.0/Enumerable.html#method-i-reduce) for details
+* See [reduce series](https://blog.lerner.co.il/summary-reduce-series/) for more examples and ways to implement `map` and `select` with `reduce`
 
 ```ruby
 >> nums = [3, -2, 4, 1, -78, -42]
