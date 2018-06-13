@@ -5,6 +5,7 @@
 * [Initialization](#initialization)
 * [Accessing keys and values](#accessing-keys-and-values)
 * [Looping](#looping)
+* [Modifying elements](#modifying-elements)
 
 <br>
 
@@ -60,6 +61,19 @@
 => {}
 >> greetings[:foo].equal?(greetings[:baz])
 => false
+```
+
+* array-hash conversion
+
+```ruby
+>> {1=>2, "foo"=>"baz"}.to_a
+=> [[1, 2], ["foo", "baz"]]
+
+>> [[1, 2], ['foo', 'baz']].to_h
+=> {1=>2, "foo"=>"baz"}
+
+>> [[:Foo, 86], [:Bar, 92], [:Baz, 75]].to_h
+=> {:Foo=>86, :Bar=>92, :Baz=>75}
 ```
 
 <br>
@@ -181,6 +195,66 @@ classic
 ["Harry Potter", "Stormlight Archive", "Kingkiller Chronicle"]
 ["Ender's Game", "Martian", "Red Rising"]
 ["Count of Monte Cristo", "Jane Eyre", "Scarlet Pimpernel"]
+```
+
+<br>
+
+## <a name="modifying-elements"></a>Modifying elements
+
+* adding/modifying single/multiple elements
+
+```ruby
+>> marks = {foo: 86, baz: 75, lo: 73}
+=> {:foo=>86, :baz=>75, :lo=>73}
+
+>> marks[:foo] = 95
+=> 95
+>> marks[:baz], marks[:kek] = [80, 62]
+=> [80, 62]
+
+>> marks
+=> {:foo=>95, :baz=>80, :lo=>73, :kek=>62}
+```
+
+* merging two hashes
+
+```ruby
+>> marks = {foo: 86, baz: 75}
+=> {:foo=>86, :baz=>75}
+>> new_marks = {foo: 95, baz: 80, lo: 73}
+=> {:foo=>95, :baz=>80, :lo=>73}
+
+# use merge! for in-place modification
+>> marks.merge(new_marks)
+=> {:foo=>95, :baz=>80, :lo=>73}
+
+# block form
+>> marks.merge(new_marks) { |k, v1, v2| v1 + v2/10 }
+=> {:foo=>95, :baz=>83, :lo=>73}
+```
+
+* deleting elements
+
+```ruby
+# based on key
+>> marks = {foo: 86, baz: 75, lo: 73}
+=> {:foo=>86, :baz=>75, :lo=>73}
+>> marks.delete(:foo)
+=> 86
+>> marks
+=> {:baz=>75, :lo=>73}
+
+# based on a condition
+>> marks = {foo: 86, baz: 75, lo: 73}
+=> {:foo=>86, :baz=>75, :lo=>73}
+>> marks.delete_if { |k, v| v < 80 }
+=> {:foo=>86}
+>> marks
+=> {:foo=>86}
+
+# delete all elements
+>> marks.clear
+=> {}
 ```
 
 
