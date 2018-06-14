@@ -6,6 +6,7 @@
 * [Accessing keys and values](#accessing-keys-and-values)
 * [Looping](#looping)
 * [Modifying elements](#modifying-elements)
+* [Filtering](#filtering)
 
 <br>
 
@@ -80,7 +81,7 @@
 
 ## <a name="accessing-keys-and-values"></a>Accessing keys and values
 
-* accessing a value based on key and getting all keys/values
+* accessing based on key and getting all keys/values
 
 ```ruby
 >> marks = {Foo: 86, Bar: 92, Baz: 75}
@@ -89,6 +90,10 @@
 => 86
 >> marks['Foo'.to_sym]
 => 86
+
+# key-value pair
+>> marks.assoc(:Bar)
+=> [:Bar, 92]
 
 >> marks.keys
 => [:Foo, :Bar, :Baz]
@@ -114,7 +119,7 @@ KeyError (key not found: :xyz)
 => 60
 ```
 
-* reverse look-up, getting the first key based on given value
+* reverse look-up, getting the first key or key-value pair based on given value
 
 ```ruby
 >> marks = {Foo: 86, Bar: 75, Baz: 75}
@@ -122,6 +127,8 @@ KeyError (key not found: :xyz)
 
 >> marks.key(75)
 => :Bar
+>> marks.rassoc(75)
+=> [:Bar, 75]
 
 >> marks.key(100)
 => nil
@@ -138,6 +145,12 @@ KeyError (key not found: :xyz)
 
 >> marks.slice(:Bar, :Lo)
 => {:Bar=>92, :Lo=>73}
+
+# if key doesn't match
+>> marks.slice(:Bar, :Low)
+=> {:Bar=>92}
+>> marks.slice(:Low)
+=> {}
 ```
 
 * getting multiple values
@@ -255,6 +268,63 @@ classic
 # delete all elements
 >> marks.clear
 => {}
+```
+
+<br>
+
+## <a name="filtering"></a>Filtering
+
+* check if a key/value is present
+
+```ruby
+>> fruits = {'apple' => 5, 'mango' => 10, 'guava' => 6}
+=> {"apple"=>5, "mango"=>10, "guava"=>6}
+
+>> fruits.key?('apple')
+=> true
+>> fruits.key?('orange')
+=> false
+
+>> fruits.value?(10)
+=> true
+>> fruits.value?(2)
+=> false
+```
+
+* get hash slice based on a condition
+
+```ruby
+>> fruits = {'apple' => 5, 'mango' => 10, 'guava' => 6, 'orange' => 12}
+=> {"apple"=>5, "mango"=>10, "guava"=>6, "orange"=>12}
+
+# use select! for in-place modification
+>> fruits.select { |k, v| v > 5 }
+=> {"mango"=>10, "guava"=>6, "orange"=>12}
+
+>> fruits.select { |k, v| k.length > 5 }
+=> {"orange"=>12}
+
+>> fruits.select { |k, v| k[0] < 'o' && v > 5 }
+=> {"mango"=>10, "guava"=>6}
+```
+
+* use `partition` to get both matching and non-matching elements
+
+```ruby
+>> fruits = {'apple' => 5, 'mango' => 10, 'guava' => 6, 'orange' => 12}
+=> {"apple"=>5, "mango"=>10, "guava"=>6, "orange"=>12}
+
+# returns array of arrays
+>> fruits.partition { |k, v| k.length > 5 }
+=> [[["orange", 12]], [["apple", 5], ["mango", 10], ["guava", 6]]]
+
+# convert to hash if needed
+>> m_h, nm_h = fruits.partition { |k, v| k.length > 5 }.map(&:to_h)
+=> [{"orange"=>12}, {"apple"=>5, "mango"=>10, "guava"=>6}]
+>> m_h
+=> {"orange"=>12}
+>> nm_h
+=> {"apple"=>5, "mango"=>10, "guava"=>6}
 ```
 
 
