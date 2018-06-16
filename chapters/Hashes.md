@@ -7,6 +7,7 @@
 * [Looping](#looping)
 * [Modifying elements](#modifying-elements)
 * [Filtering](#filtering)
+* [Transforming keys and values](#transforming-keys-and-values)
 
 <br>
 
@@ -15,6 +16,7 @@
 * as comma separated key-value pairs inside `{}`
 * both key and value can be of any data type and be result of an expression
     * but having mutable data type as key requires careful usage
+    * as a special case, [string keys are frozen](https://stackoverflow.com/questions/13044839/why-is-a-string-key-for-a-hash-frozen)
 
 ```ruby
 >> marks = {'Foo' => 86, 'Bar' => 92, 'Baz' => 75}
@@ -326,6 +328,43 @@ classic
 >> nm_h
 => {"apple"=>5, "mango"=>10, "guava"=>6}
 ```
+
+<br>
+
+## <a name="transforming-keys-and-values"></a>Transforming keys and values
+
+* changing keys
+
+```ruby
+>> fruits = {'apple' => 5, 'mango' => 10, 'guava' => 6, 'orange' => 12}
+=> {"apple"=>5, "mango"=>10, "guava"=>6, "orange"=>12}
+
+>> fruits.transform_keys { |k| k.capitalize }
+=> {"Apple"=>5, "Mango"=>10, "Guava"=>6, "Orange"=>12}
+
+# in-place modification
+>> fruits.transform_keys! { |k| k.capitalize }
+=> {"Apple"=>5, "Mango"=>10, "Guava"=>6, "Orange"=>12}
+
+>> fruits.transform_keys(&:to_sym)
+=> {:Apple=>5, :Mango=>10, :Guava=>6, :Orange=>12}
+```
+
+* changing values
+
+```ruby
+>> marks = {"foo" => 90, "baz" => 80, "lo" => 73, "kek" => 62}
+=> {"foo"=>90, "baz"=>80, "lo"=>73, "kek"=>62}
+
+>> marks.transform_values { |v| v + 5 }
+=> {"foo"=>95, "baz"=>85, "lo"=>78, "kek"=>67}
+
+# in-place modification
+>> marks.transform_values! { |v| v - 5 }
+=> {"foo"=>85, "baz"=>75, "lo"=>68, "kek"=>57}
+```
+
+
 
 
 
