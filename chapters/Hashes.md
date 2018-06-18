@@ -8,6 +8,7 @@
 * [Modifying elements](#modifying-elements)
 * [Filtering](#filtering)
 * [Transforming keys and values](#transforming-keys-and-values)
+* [Mutable keys](#mutable-keys)
 
 <br>
 
@@ -293,7 +294,7 @@ classic
 => false
 ```
 
-* get hash slice based on a condition
+* slicing based on a condition
 
 ```ruby
 >> fruits = {'apple' => 5, 'mango' => 10, 'guava' => 6, 'orange' => 12}
@@ -302,6 +303,11 @@ classic
 # use select! for in-place modification
 >> fruits.select { |k, v| v > 5 }
 => {"mango"=>10, "guava"=>6, "orange"=>12}
+# apply keys/values methods when needed
+>> fruits.select { |k, v| v > 5 }.keys
+=> ["mango", "guava", "orange"]
+>> fruits.select { |k, v| v > 5 }.values
+=> [10, 6, 12]
 
 >> fruits.select { |k, v| k.length > 5 }
 => {"orange"=>12}
@@ -364,6 +370,74 @@ classic
 => {"foo"=>85, "baz"=>75, "lo"=>68, "kek"=>57}
 ```
 
+* use `map` to work with keys and values together
+
+```ruby
+>> marks = {"foo" => 90, "baz" => 80, "lo" => 73, "kek" => 62}
+=> {"foo"=>90, "baz"=>80, "lo"=>73, "kek"=>62}
+
+>> marks.map { |k, v| marks[k] = v + 5 if k[0] > 'c' }
+=> [95, nil, 78, 67]
+>> marks
+=> {"foo"=>95, "baz"=>80, "lo"=>78, "kek"=>67}
+```
+
+<br>
+
+## <a name="mutable-keys"></a>Mutable keys
+
+* strings used as hash key are frozen and cannot be modified - they act like immutable keys much like integers
+
+```ruby
+>> s = 'foo'
+=> "foo"
+>> h = { s => 42 }
+=> {"foo"=>42}
+
+>> s.object_id
+=> 47309460553140
+>> h.keys[0].object_id
+=> 47309460712980
+
+>> s.upcase!
+=> "FOO"
+>> h
+=> {"foo"=>42}
+
+>> h.keys[0].capitalize!
+FrozenError (can't modify frozen String)
+```
+
+* using mutable types like array and hash as key requires careful usage
+* changing the mutable key will leave the hash with old hash value unless recalculated using `rehash` method
+    * until rehashing, it will also be possible to add another key with same value as the modified mutable key
+
+```ruby
+>> a = [3.14, 42]
+=> [3.14, 42]
+>> h = { a => 'foo' }
+=> {[3.14, 42]=>"foo"}
+
+>> a.equal?(h.keys[0])
+=> true
+
+>> a[1] = 100
+=> 100
+>> h
+=> {[3.14, 100]=>"foo"}
+
+>> h[a]
+=> nil
+>> h[[3.14, 100]]
+=> nil
+
+>> h.rehash
+=> {[3.14, 100]=>"foo"}
+>> h[a]
+=> "foo"
+>> h[[3.14, 100]]
+=> "foo"
+```
 
 
 
