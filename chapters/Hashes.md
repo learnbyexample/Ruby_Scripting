@@ -9,6 +9,7 @@
 * [Filtering](#filtering)
 * [Transforming keys and values](#transforming-keys-and-values)
 * [Mutable keys](#mutable-keys)
+* [Miscellaneous](#miscellaneous)
 
 <br>
 
@@ -316,6 +317,7 @@ classic
 => {"mango"=>10, "guava"=>6}
 ```
 
+* Like arrays, one can use [ruby-doc: Enumerable](https://ruby-doc.org/core-2.5.0/Enumerable.html) methods for hashes as well
 * use `partition` to get both matching and non-matching elements
 
 ```ruby
@@ -439,7 +441,68 @@ FrozenError (can't modify frozen String)
 => "foo"
 ```
 
+<br>
 
+## <a name="miscellaneous"></a>Miscellaneous
 
+* `flatten` method will convert hash to array with each key-value pair forming two elements
+    * optional argument allows to specify depth of flattening
+* `compact` method will remove all keys with `nil` value
+    * keys with `nil` value within nested hash won't be removed
 
+```ruby
+>> marks = {"foo" => 90, "baz" => 80, "lo" => 73}
+=> {"foo"=>90, "baz"=>80, "lo"=>73}
+>> marks.flatten
+=> ["foo", 90, "baz", 80, "lo", 73]
+
+>> h = { 'a' => [1, 2, 4], 'b' => %w[foo baz] }
+=> {"a"=>[1, 2, 4], "b"=>["foo", "baz"]}
+>> h.flatten
+=> ["a", [1, 2, 4], "b", ["foo", "baz"]]
+>> h.flatten(2)
+=> ["a", 1, 2, 4, "b", "foo", "baz"]
+
+>> h = { 'a' => 42, 'b' => 'foo', 'c' => nil }
+=> {"a"=>42, "b"=>"foo", "c"=>nil}
+# use compact! for in-place modification
+>> h.compact
+=> {"a"=>42, "b"=>"foo"}
+```
+
+* `invert` will swap key-value pairs
+* in case of multiple keys with same value, the last key-value pair will win
+
+```ruby
+>> h = { 'a' => 42, 'b' => 'foo', 'c' => 3, 'd' => 42 }
+=> {"a"=>42, "b"=>"foo", "c"=>3, "d"=>42}
+>> h.invert
+=> {42=>"d", "foo"=>"b", 3=>"c"}
+>> h.length == h.invert.length
+=> false
+
+>> h = { foo: 90, baz: 80 }
+=> {:foo=>90, :baz=>80}
+>> h.invert
+=> {90=>:foo, 80=>:baz}
+>> h.length == h.invert.length
+=> true
+```
+
+* getting user input
+* manually convert based on agreed upon delimiter or use `eval` if input can be trusted
+
+```ruby
+>> usr_ip = gets.chomp
+foo:baz:123:good
+=> "foo:baz:123:good"
+>> h = usr_ip.split(':').each_slice(2).to_h
+=> {"foo"=>"baz", "123"=>"good"}
+
+>> usr_ip = gets.chomp
+{ a: 42, b: 78, c: 99 }
+=> "{ a: 42, b: 78, c: 99 }"
+>> h = eval(usr_ip)
+=> {:a=>42, :b=>78, :c=>99}
+```
 
