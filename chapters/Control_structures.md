@@ -490,7 +490,8 @@ Enter a palindrome word: gag
 => 9
 ```
 
-* the block arguments defined within `||` won't affect variable of same name in the given scope
+* blocks create a new scope
+* the block arguments defined within `||` won't affect variable of same name in the outer scope
     * they are similar to argument names used while defining a method
     * block here means both `{}` and `do..end` forms
 
@@ -519,18 +520,18 @@ Enter a palindrome word: gag
 * variables created within block are local to that block and not visible outside
 
 ```ruby
->> 2.times { i = 10; puts 'hi' }
+>> 2.times { foo = 10; puts 'hi' }
 hi
 hi
 => 2
->> i
+>> foo
 Traceback (most recent call last):
         2: from /usr/local/bin/irb:11:in `<main>'
         1: from (irb):2
-NameError (undefined local variable or method `i' for main:Object)
+NameError (undefined local variable or method `foo' for main:Object)
 ```
 
-* however, existing variables in the given scope will be visible inside the block and can be modified
+* existing variables in the outer scope will be visible inside the block and can be modified
 
 ```ruby
 >> num = 25
@@ -545,5 +546,25 @@ NameError (undefined local variable or method `i' for main:Object)
 => 3
 >> num
 => 152587890625
+```
+
+* to create a local variable of same name, declare it after a `;` in the block arguments
+* See also [ruby-doc: Block Local Arguments](https://ruby-doc.org/core-2.5.0/doc/syntax/calling_methods_rdoc.html#label-Block+Local+Arguments)
+
+```ruby
+>> num = 25
+=> 25
+
+>> 3.times { |i| puts "#{i}: #{num.inspect}" }
+0: 25
+1: 25
+2: 25
+=> 3
+
+>> 3.times { |i; num| puts "#{i}: #{num.inspect}" }
+0: nil
+1: nil
+2: nil
+=> 3
 ```
 
