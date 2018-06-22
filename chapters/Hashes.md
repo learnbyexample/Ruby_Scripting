@@ -179,6 +179,7 @@ KeyError (key not found: :xyz)
 ## <a name="looping"></a>Looping
 
 * for loop and each method to iterate over key-value pairs
+* **Note** that Hashes maintain the same order in which key-value pairs were added
 
 ```ruby
 >> fav_books = {
