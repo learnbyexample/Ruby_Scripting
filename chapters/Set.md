@@ -4,6 +4,7 @@
 
 * [Initialization](#initialization)
 * [Set operations](#set-operations)
+* [Miscellaneous](#miscellaneous)
 
 <br>
 
@@ -63,6 +64,19 @@
 => #<Set: {"A", "l", "c", "h", "e", "m", "i", "s", "t"}>
 ```
 
+* if needed, the collection could always be sorted by using `SortedSet` instead of `Set`
+
+```ruby
+>> require 'set'
+=> true
+
+>> nums = Set[3, 2, 5, 7, 1, 2, 3, 4]
+=> #<Set: {3, 2, 5, 7, 1, 4}>
+
+>> sorted_nums = SortedSet[3, 2, 5, 7, 1, 2, 3, 4]
+=> #<SortedSet: {1, 2, 3, 4, 5, 7}>
+```
+
 <br>
 
 ## <a name="set-operations"></a>Set operations
@@ -97,7 +111,7 @@
 >> nums_1 & nums_2
 => #<Set: {3, 2, 42}>
 
-# difference between two sets
+# difference between two sets, use 'subtract' method for in-place modification
 >> nums_1 - nums_2
 => #<Set: {4, 1, 78}>
 >> nums_2 - nums_1
@@ -107,7 +121,7 @@
 => #<Set: {5, 6, 10, 4, 1, 78}>
 ```
 
-* subsets
+* subsets and supersets
 
 ```ruby
 >> s1 = Set[4, 2, 1]
@@ -128,7 +142,7 @@
 => true
 ```
 
-* proper subsets - like subsets but length cannot be same
+* proper subset/superset - like subset/superset but length cannot be same
 
 ```ruby
 # subset
@@ -147,6 +161,25 @@
 => false
 # superset
 >> Set[2, 1, 3] >= Set[1, 3, 2]
+=> true
+```
+
+* checking whether two sets have some common elements or not
+
+```ruby
+>> s1 = Set[4, 2, 1]
+=> #<Set: {4, 2, 1}>
+>> s2 = Set[1, 42]
+=> #<Set: {1, 42}>
+>> s3 = Set[3, 7]
+=> #<Set: {3, 7}>
+
+# at least one common element
+>> s1.intersect?(s2)
+=> true
+
+# no common element
+>> s2.disjoint?(s3)
 => true
 ```
 
@@ -172,3 +205,56 @@
 => #<Set: {12, 17, 42, 100, 5, 8}>
 ```
 
+* the `add?` method behaves similarly to `add` but additionally allows to act upon whether the element already existed or not
+
+```ruby
+>> nums = [3, 2, 5, 7, 1, 2, 3, 4]
+=> [3, 2, 5, 7, 1, 2, 3, 4]
+
+>> seen = Set[]
+=> #<Set: {}>
+>> nums.each { |n| puts n if seen.add?(n) }
+3
+2
+5
+7
+1
+4
+=> [3, 2, 5, 7, 1, 2, 3, 4]
+
+>> seen = Set[]
+=> #<Set: {}>
+>> nums.each { |n| puts n if !seen.add?(n) }
+2
+3
+=> [3, 2, 5, 7, 1, 2, 3, 4]
+```
+
+<br>
+
+## <a name="miscellaneous"></a>Miscellaneous
+
+* check if a value is present
+
+```ruby
+>> books = Set.new(['Harry Potter', 'Stormlight Archive'])
+=> #<Set: {"Harry Potter", "Stormlight Archive"}>
+
+>> books.include?('Harry Potter')
+=> true
+>> books.include?('Alchemist')
+=> false
+```
+
+* create subsets based on a condition
+
+```ruby
+>> nums = Set[3, 2, 5, 7, 1, 4]
+=> #<Set: {3, 2, 5, 7, 1, 4}>
+
+>> nums.divide { |n| n.even? }
+=> #<Set: {#<Set: {3, 5, 7, 1}>, #<Set: {2, 4}>}>
+
+>> nums.divide { |n| n % 3 }
+=> #<Set: {#<Set: {3}>, #<Set: {2, 5}>, #<Set: {7, 1, 4}>}>
+```
