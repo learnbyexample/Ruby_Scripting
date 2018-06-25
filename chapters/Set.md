@@ -230,6 +230,30 @@
 => [3, 2, 5, 7, 1, 2, 3, 4]
 ```
 
+* deleting elements from a set
+
+```ruby
+>> s1 = Set[4, 2, 1, 12]
+=> #<Set: {4, 2, 1, 12}>
+>> s2 = Set[1, 4, 25]
+=> #<Set: {1, 4, 25}>
+# same as s1 - s2 but in-place modification
+>> s1.subtract(s2)
+=> #<Set: {2, 12}>
+
+>> nums = Set[3, 2, 5, 7, 1, 4]
+=> #<Set: {3, 2, 5, 7, 1, 4}>
+# deleting single element, no exception is element doesn't exist
+>> nums.delete(5)
+=> #<Set: {3, 2, 7, 1, 4}>
+# similar to delete, but allows to act further if element didn't exist
+>> nums.delete?(50)
+=> nil
+# deleting based on a condition
+>> nums.delete_if { |n| n.even? }
+=> #<Set: {3, 7, 1}>
+```
+
 <br>
 
 ## <a name="miscellaneous"></a>Miscellaneous
@@ -254,7 +278,37 @@
 
 >> nums.divide { |n| n.even? }
 => #<Set: {#<Set: {3, 5, 7, 1}>, #<Set: {2, 4}>}>
+>> nums.classify { |n| n.even? }
+=> {false=>#<Set: {3, 5, 7, 1}>, true=>#<Set: {2, 4}>}
+>> nums.classify { |n| n.even? }.transform_values(&:to_a)
+=> {false=>[3, 5, 7, 1], true=>[2, 4]}
 
 >> nums.divide { |n| n % 3 }
 => #<Set: {#<Set: {3}>, #<Set: {2, 5}>, #<Set: {7, 1, 4}>}>
+>> nums.classify { |n| n % 3 }
+=> {0=>#<Set: {3}>, 2=>#<Set: {2, 5}>, 1=>#<Set: {7, 1, 4}>}
+>> nums.classify { |n| n % 3 }.transform_values(&:to_a)
+=> {0=>[3], 2=>[2, 5], 1=>[7, 1, 4]}
 ```
+
+* looping and mapping
+
+```ruby
+>> fruits = Set['apple', 'mango', 'orange']
+=> #<Set: {"apple", "mango", "orange"}>
+
+>> fruits.each { |f| puts f }
+apple
+mango
+orange
+=> #<Set: {"apple", "mango", "orange"}>
+
+# map is not defined, so Enumerable method is used and returns an array
+>> fruits.map { |f| f.upcase }
+=> ["APPLE", "MANGO", "ORANGE"]
+
+# map! is defined, transforms Set in-place
+>> fruits.map!(&:upcase)
+=> #<Set: {"APPLE", "MANGO", "ORANGE"}>
+```
+
