@@ -144,9 +144,9 @@ Enter an integer: 17
 **********17**********
 ```
 
-* like the example above, often the body consists of single expression
+* like the example above, the body might consist of single expression only
 * for such cases, one can use single line version
-    * more than one expression can be specified, but such forms are best left for code golfing and [one-liners](https://github.com/learnbyexample/Command-line-text-processing/blob/master/ruby_one_liners.md)
+    * more than one expression can be specified, but such forms are best left for code golfing(See [Ruby one-liners](https://github.com/learnbyexample/Command-line-text-processing/blob/master/ruby_one_liners.md) for examples)
 
 ```ruby
 >> num = 42
@@ -166,7 +166,7 @@ Enter an integer: 17
 => 42
 ```
 
-* to execute code for both true/false cases, add `else` portion
+* to execute code depending on true/false cases, add `else` portion
 
 ```ruby
 >> num = 3
@@ -180,7 +180,7 @@ Enter an integer: 17
 => nil
 ```
 
-* for short expressions, the ternary operator `?:` can be used
+* as an alternate for `if-else`, the ternary operator `?:` can be used
 
 ```ruby
 >> puts num%2 == 0 ? "#{num} is even" : "#{num} is odd"
@@ -243,7 +243,8 @@ Oops, you guessed too high
 ## <a name="for"></a>for
 
 * there are various ways in Ruby to achieve iteration depending on context
-* the traditional `for(i=0; i<5; i++)` can be done using Range object and for loop
+    * iterating over objects like array, string, etc will be covered later
+* the traditional `for(i=0; i<5; i++)` can be done using Range object
 * Range is specified using start and end values separated by `..` or `...`
     * to include end value, use `..`
     * to exclude end value, use `...`
@@ -280,27 +281,8 @@ $ ./for_loop.rb
 9 * 19 = 171
 ```
 
-* to iterate over a string value character by character, convert the string to an array using `chars` method
-
-```ruby
->> str = 'hi there'
-=> "hi there"
->> for c in str.chars
->>   puts c
->> end
-h
-i
- 
-t
-h
-e
-r
-e
-=> ["h", "i", " ", "t", "h", "e", "r", "e"]
-```
-
 * to do something `n` number of times, use the `times` method on an integer value
-* in the example below, the code within `{}` is a `block` (we'll see this form more often here on)
+* in the example below, the code within `{}` and `do...end` is called a `block` (we'll see this form more often here on)
 
 ```ruby
 >> 2.times { puts 'hi' }
@@ -548,7 +530,7 @@ NameError (undefined local variable or method `foo' for main:Object)
 => 152587890625
 ```
 
-* to create a local variable of same name, declare it after a `;` in the block arguments
+* to create a new local variable of same name as that of a variable in outer scope, declare it after a `;` in the block arguments
 * See also [ruby-doc: Block Local Arguments](https://ruby-doc.org/core-2.5.0/doc/syntax/calling_methods_rdoc.html#label-Block+Local+Arguments)
 
 ```ruby
