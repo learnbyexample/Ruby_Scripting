@@ -43,6 +43,8 @@ hello there!
 ```
 
 * An alternate way to run is using [shebang](https://en.wikipedia.org/wiki/Shebang_(Unix))
+* the `#` character indicates start of comment in Ruby
+* if `#` is followed by `!` in first line of the program, then it becomes a shebang
 
 ```bash
 $ type env ruby
@@ -72,6 +74,7 @@ Hello World
 * Result of entered expression is displayed with a prefix `=>`
     * also, a special variable `_` holds the result of last expression in the interactive session
 * use `exit` to end the interactive session
+* comments will be used within code snippets presented in this material to add relevant information
 
 ```ruby
 $ # puts always returns nil
