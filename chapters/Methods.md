@@ -127,8 +127,9 @@ $ ./num_sum.rb
 
 * method arguments can be given a default value by assigning a value during definition
     * we have previously seen examples for `gets` and `chomp` methods
-* arguments with defaults must be grouped together - can be at start/end/middle, mixed with normal arguments
-    * these are still positional - cannot be passed out-of-order while calling
+* arguments with defaults must be grouped together but can be placed at start/end/middle w.r.t normal positional arguments
+* default valued arguments are positional - cannot be passed out-of-order while calling
+* in the example below, multiple objects are passed to `puts` - newline is added (if not already present) to each object
 
 ```ruby
 #!/usr/bin/env ruby
