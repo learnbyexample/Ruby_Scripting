@@ -35,7 +35,7 @@ Good morning!
 ```ruby
 #!/usr/bin/env ruby
 
-print "Hi there! What's your name? "
+print 'Hi there! What is your name? '
 usr_name = gets.chomp
 print 'And your favorite color is? '
 usr_color = gets.chomp
@@ -47,7 +47,7 @@ puts "\n#{usr_name}, I like the #{usr_color} color too :)"
 
 ```bash
 $ ./user_input_str.rb
-Hi there! What's your name? learnbyexample
+Hi there! What is your name? learnbyexample
 And your favorite color is? blue
 
 learnbyexample, I like the blue color too :)
@@ -80,7 +80,7 @@ world;
 
 * or, pass the string as `sep` argument of `gets` method
     * by default, `sep` uses the value of `$/` variable
-    * default valued argument will be covered in more detail later
+    * default valued argument is explained in [Methods](./Methods.md#default-valued-arguments) chapter
 
 ```ruby
 >> baz = gets(sep='END')
@@ -106,7 +106,7 @@ cya tomorrow.END
 $ # notice how the two lines 1 and 2 are read
 $ # instead of waiting for user input
 $ ./user_input_str.rb <(seq 2)
-Hi there! What's your name? And your favorite color is? 
+Hi there! What is your name? And your favorite color is? 
 1, I like the 2 color too :)
 ```
 
@@ -164,7 +164,7 @@ ArgumentError (invalid value for Integer(): "12c")
 >> Float("\t 4.12 \n ")
 => 4.12
 
-# handling non-decimal input
+# converting numbers from another base
 >> '0b100'.to_i(base=2)
 => 4
 >> Integer('0b100')
