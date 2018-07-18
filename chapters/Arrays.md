@@ -125,7 +125,7 @@ IndexError (index 2 outside of array bounds: -2...2)
 ```
 
 * multiple variable assignment
-* See also [ruby-doc: Array to Arguments Conversion](https://ruby-doc.org/core-2.5.0/doc/syntax/calling_methods_rdoc.html#label-Array+to+Arguments+Conversion)
+* See also [ruby-doc: Multiple Assignment](https://ruby-doc.org/core-2.5.0/doc/syntax/assignment_rdoc.html#label-Multiple+Assignment)
 
 ```ruby
 >> a, b = [2, 42]
@@ -176,6 +176,8 @@ IndexError (index 2 outside of array bounds: -2...2)
 # range can be used to specify start and end index
 >> primes[2..4]
 => [5, 7, 11]
+>> primes[2...4]
+=> [5, 7]
 >> primes[1..-2]
 => [3, 5, 7, 11]
 
@@ -246,6 +248,11 @@ IndexError (index 2 outside of array bounds: -2...2)
 => [13, 11, 7, 5, 3, 2]
 >> primes.values_at(*(primes.length-1).step(0, -2))
 => [13, 7, 3]
+
+>> idx_req = [3, 1, -2..-1]
+=> [3, 1, -2..-1]
+>> primes.values_at(*idx_req)
+=> [7, 3, 11, 13]
 ```
 
 <br>
@@ -288,7 +295,8 @@ IndexError (index 2 outside of array bounds: -2...2)
 => [1, "baz", 3]
 ```
 
-* assigning an element of array clone to new value won't affect the original array irrespective of mutability
+* `clone` method gives a shallow copy of original array
+* assigning new value to an element of cloned array won't affect the original array irrespective of mutability
 
 ```ruby
 >> a = [1, 'good']
@@ -311,7 +319,7 @@ IndexError (index 2 outside of array bounds: -2...2)
 => [1, "good"]
 ```
 
-* modifying a mutable element of array clone will affect the original array as well
+* modifying a mutable element of cloned array will affect the original array as well
 
 ```ruby
 >> fruits = %w[apple mango guava]
@@ -363,7 +371,7 @@ false
 
 * however, above solution would fail for nested arrays and other cases 
 * using `Marshal` module is one way to create a copy of array without worrying if it contains mutable objects
-* See [ruby-doc: Marshal](https://ruby-doc.org/core-2.5.0/Marshal.html) for caveats
+    * See [ruby-doc: Marshal](https://ruby-doc.org/core-2.5.0/Marshal.html) for caveats
 
 ```ruby
 >> foo = [42, [12, 5, 63], ['foo', [7, 6]]]
@@ -407,6 +415,7 @@ false
 ```
 
 * using array methods
+* recall that blocks create a new scope, whereas for loop doesn't
 
 ```ruby
 >> fruits = %w[apple mango guava orange]
@@ -419,13 +428,15 @@ guava
 orange
 => ["apple", "mango", "guava", "orange"]
 
+# for multiple statements, do...end is preferred
 >> fruits.reverse_each do |f|
-?>   puts f
+?>   op = f.capitalize
+>>   puts op
 >> end
-orange
-guava
-mango
-apple
+Orange
+Guava
+Mango
+Apple
 => ["apple", "mango", "guava", "orange"]
 ```
 
@@ -545,6 +556,9 @@ apple
 ```
 
 * deleting elements based on index
+* some methods always modify the array in-place, for ex: `append` and `concat` methods
+* some methods always return value/array, for ex: `count` and `drop` methods
+* some methods have two versions - one for returning value/array and another with `!` for in-place modification, for ex: `slice` and `slice!`
 
 ```ruby
 >> primes = [2, 3, 5, 7, 11, 13, 17]
@@ -598,6 +612,7 @@ apple
 >> primes
 => [2, 3, 5, 7]
 
+# deletes last 2 elements
 >> primes.pop(2)
 => [5, 7]
 >> primes
@@ -610,6 +625,7 @@ apple
 ```
 
 * deleting element(s) based on value(s)
+* to delete based on a condition, use `select` or `reject` methods (see [Filtering](#filtering) section)
 
 ```ruby
 # single value
@@ -727,11 +743,11 @@ apple
 >> nums.partition { |n| n > 2 }
 => [[5, 3], [1, 2, 1, 1, 2]]
 
->> gt2, lt2 = nums.partition { |n| n > 2 }
+>> gt2, lte2 = nums.partition { |n| n > 2 }
 => [[5, 3], [1, 2, 1, 1, 2]]
 >> gt2
 => [5, 3]
->> lt2
+>> lte2
 => [1, 2, 1, 1, 2]
 ```
 
@@ -838,7 +854,7 @@ ArgumentError (comparison of Integer with String failed)
 >> words.sort { |a, b| [a.length, a] <=> [b.length, b] }
 => ["bad", "foo", "how", "good", "nice", "teal"]
 
-# negating will give reverse order for methods returning a numeric value
+# negating will give reverse order for numeric values
 # here, we get longer words first, ascending alphabetic order as tie-breaker
 >> words.sort { |a, b| [-a.length, a] <=> [-b.length, b] }
 => ["good", "nice", "teal", "bad", "foo", "how"]
@@ -851,7 +867,7 @@ ArgumentError (comparison of Integer with String failed)
     * for ex: sorting words in an array by length of the word
 * in such cases, use `sort_by` for simpler syntax
     * See [ruby-doc: sort_by](https://ruby-doc.org/core-2.5.0/Enumerable.html#method-i-sort_by) for details on performance considerations
-* which can further be shortened by using `&` operator and method's symbol
+* which can further be shortened by using `&` operator
     * See also [stackoverflow: What does &:name mean in Ruby?](https://stackoverflow.com/questions/1217088/what-does-mapname-mean-in-ruby)
 * to debug an issue with `sort_by`, replace it with `map` - that would show the mapping based on which you are trying to sort the array
 
@@ -876,7 +892,7 @@ ArgumentError (comparison of Integer with String failed)
 => ["-42", "4.3", "55", "64"]
 ```
 
-* `min` and `max` values
+* `min` and `max` value(s)
 * kinda syntactical sugar for `sort` method
 
 ```ruby
@@ -987,7 +1003,7 @@ ArgumentError (comparison of Integer with String failed)
 >> words = %w[fuliginous crusado Morello Irk seam]
 => ["fuliginous", "crusado", "Morello", "Irk", "seam"]
 # downcase and shuffle each string element
-# multiline version for illustration
+# multiline version for illustration purposes
 >> words.map do |w|
 ?>   arr = w.downcase.chars
 >>   arr.shuffle.join
@@ -1003,7 +1019,7 @@ ArgumentError (comparison of Integer with String failed)
 ## <a name="miscellaneous"></a>Miscellaneous
 
 * `reduce` allows to apply a transformation between elements of the array to get single output value
-    * a few variables/methods in Ruby have aliases, `reduce` has one as `inject`
+    * some of the variables/methods in Ruby have aliases, for ex: `reduce` and `inject` are aliases
 * See [ruby-doc: reduce](https://ruby-doc.org/core-2.5.0/Enumerable.html#method-i-reduce) for details
 * See [reduce series](https://blog.lerner.co.il/summary-reduce-series/) for more examples and ways to implement `map` and `select` with `reduce`
 
