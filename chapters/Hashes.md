@@ -62,7 +62,7 @@
 => {}
 >> greetings[:foo].equal?(greetings[:baz])
 => true
->> greetings = Hash.new { |h, k| h[k] = 'good day' }
+>> greetings = Hash.new { 'good day' }
 => {}
 >> greetings[:foo].equal?(greetings[:baz])
 => false
@@ -165,6 +165,7 @@ KeyError (key not found: :xyz)
 
 >> marks.values_at(:Bar, :Lo)
 => [92, 73]
+# if key is not present, gives nil or the default value if set
 >> marks.values_at(:Baz, :xyz)
 => [75, nil]
 
@@ -184,7 +185,7 @@ KeyError (key not found: :xyz)
 ```ruby
 >> fav_books = {
 ?>   'fantasy' => ['Harry Potter', 'Stormlight Archive', 'Kingkiller Chronicle'],
-?>   'sci-fi'  => ["Ender's Game", 'Martian', 'Red Rising'],
+?>   'sci-fi'  => ['Enders Game', 'Martian', 'Red Rising'],
 ?>   'classic' => ['Count of Monte Cristo', 'Jane Eyre', 'Scarlet Pimpernel']
 >> }
 
@@ -192,16 +193,16 @@ KeyError (key not found: :xyz)
 >>   puts "#{genre}: #{books.join(', ')}"
 >> end
 fantasy: Harry Potter, Stormlight Archive, Kingkiller Chronicle
-sci-fi: Ender's Game, Martian, Red Rising
+sci-fi: Enders Game, Martian, Red Rising
 classic: Count of Monte Cristo, Jane Eyre, Scarlet Pimpernel
 
 >> fav_books.each { |genre, books| puts "#{genre}: #{books.join(', ')}" }
 fantasy: Harry Potter, Stormlight Archive, Kingkiller Chronicle
-sci-fi: Ender's Game, Martian, Red Rising
+sci-fi: Enders Game, Martian, Red Rising
 classic: Count of Monte Cristo, Jane Eyre, Scarlet Pimpernel
 ```
 
-* to iterate over key or value
+* to iterate over all the keys or values
 
 ```ruby
 >> fav_books.each_key { |k| puts k }
@@ -211,7 +212,7 @@ classic
 
 >> fav_books.each_value { |v| puts v.inspect }
 ["Harry Potter", "Stormlight Archive", "Kingkiller Chronicle"]
-["Ender's Game", "Martian", "Red Rising"]
+["Enders Game", "Martian", "Red Rising"]
 ["Count of Monte Cristo", "Jane Eyre", "Scarlet Pimpernel"]
 ```
 
@@ -285,6 +286,7 @@ classic
 >> fruits = {'apple' => 5, 'mango' => 10, 'guava' => 6}
 => {"apple"=>5, "mango"=>10, "guava"=>6}
 
+# can also use the alias include?
 >> fruits.key?('apple')
 => true
 >> fruits.key?('orange')
@@ -414,6 +416,7 @@ FrozenError (can't modify frozen String)
 * using mutable types like array and hash as key requires careful usage
 * changing the mutable key will leave the hash with old hash value unless recalculated using `rehash` method
     * until rehashing, it will also be possible to add another key with same value as the modified mutable key
+* See also [softwareengineering.stackexchange: why use mutable keys?](https://softwareengineering.stackexchange.com/questions/197982/why-would-you-want-to-use-an-array-or-hash-as-hash-key-in-ruby)
 
 ```ruby
 >> a = [3.14, 42]
