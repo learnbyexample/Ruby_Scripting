@@ -4,6 +4,8 @@
 
 * [String formatting](#string-formatting)
 * [Looping](#looping)
+* [Case conversion](#case-conversion)
+* [Search and Replace](#search-and-replace)
 
 <br>
 
@@ -86,7 +88,7 @@ See [ruby-doc: sprintf](https://ruby-doc.org/core-2.5.0/Kernel.html#method-i-spr
 
 # left or right align string using space character
 # use ljust/rjust methods for padding with other than space character
->> '123:%010s:456' % 'hello'
+>> '123:%10s:456' % 'hello'
 => "123:     hello:456"
 >> '123:%-10s:456' % 'hello'
 => "123:hello     :456"
@@ -158,6 +160,134 @@ l
 o
 => "hello"
 ```
+
+<br>
+
+## <a name="case-conversion"></a>Case conversion
+
+* Examples below shown only for ASCII letters
+    * See [ruby-doc: downcase](https://ruby-doc.org/core-2.5.0/String.html#method-i-downcase) for details on encoding and options
+* use `!` versions for in-place modification
+    * also, the `!` versions return `nil` if no changes were made, useful for decision making
+
+```ruby
+>> s = 'hi tHeRe. haVe A GooD Day'
+=> "hi tHeRe. haVe A GooD Day"
+
+# change first character to upper case, rest all lower case
+>> s.capitalize
+=> "Hi there. have a good day"
+>> '12 heLLo'.capitalize
+=> "12 hello"
+
+# change all characters to lower case
+>> s.downcase
+=> "hi there. have a good day"
+
+# change all characters to upper case
+>> s.upcase
+=> "HI THERE. HAVE A GOOD DAY"
+
+# change upper case characters to lower case and vice versa
+>> s.swapcase
+=> "HI ThErE. HAvE a gOOd dAY"
+```
+
+<br>
+
+## <a name="search-and-replace"></a>Search and Replace
+
+Regular expression based processing will be covered separately in next chapter
+
+* check whether a string is sub-string of another
+
+```ruby
+>> sentence = 'This is a sample string'
+=> "This is a sample string"
+
+>> sentence.include?('is')
+=> true
+>> sentence.include?('is a')
+=> true
+>> sentence.include?('amp')
+=> true
+
+>> sentence.include?('this')
+=> false
+>> sentence.downcase.include?('this')
+=> true
+```
+
+* number of non-overlapping matches
+
+```ruby
+# scan returns all matches as an array
+>> 'This is a sample string'.scan('is')
+=> ["is", "is"]
+>> 'This is a sample string'.scan('is').length
+=> 2
+
+>> 'phototonic'.scan('oto')
+=> ["oto"]
+>> 'phototonic'.scan('oto').length
+=> 1
+```
+
+* number of times given character(s) are present
+
+```ruby
+>> 'hello'.count('l')
+=> 2
+>> 'hello'.count('lh')
+=> 3
+
+>> 'This is a sample string'.count('i')
+=> 3
+>> 'This is a sample string'.count(' ')
+=> 4
+>> 'This is a sample string'.count('is')
+=> 7
+```
+
+* matching start/end of string
+* more than one argument can be given to be checked
+
+```ruby
+>> words = %w[hello hi history healing]
+=> ["hello", "hi", "history", "healing"]
+
+>> words[0].start_with?('he')
+=> true
+>> words[1].start_with?('he')
+=> false
+
+>> words[2].end_with?('ry')
+=> true
+>> words[3].end_with?('ry')
+=> false
+
+>> words.select { |w| w.start_with?('he', 'his') }
+=> ["hello", "history", "healing"]
+>> words.select { |w| w.end_with?('i', 'e', 'g') }
+=> ["hi", "healing"]
+```
+
+* replace first/all matching string with another
+* use `!` versions for in-place modification
+
+```ruby
+# replace only first match
+>> 'hi there'.sub('hi', 'hello')
+=> "hello there"
+>> '2 be or not 2 be'.sub('2', 'to')
+=> "to be or not 2 be"
+
+# replace all matches
+>> '2 be or not 2 be'.gsub('2', 'to')
+=> "to be or not to be"
+```
+
+
 
 
 
