@@ -146,7 +146,7 @@ o
 => ["h", "e", "l", "l", "o"]
 ```
 
-* or use `each_char` method
+* or, use `each_char` method
 
 ```ruby
 >> str = 'hello'
@@ -233,22 +233,6 @@ Regular expression based processing will be covered separately in next chapter
 => 1
 ```
 
-* number of times given character(s) are present
-
-```ruby
->> 'hello'.count('l')
-=> 2
->> 'hello'.count('lh')
-=> 3
-
->> 'This is a sample string'.count('i')
-=> 3
->> 'This is a sample string'.count(' ')
-=> 4
->> 'This is a sample string'.count('is')
-=> 7
-```
-
 * matching start/end of string
 * more than one argument can be given to be checked
 
@@ -287,7 +271,103 @@ Regular expression based processing will be covered separately in next chapter
 => "to be or not to be"
 ```
 
+* mapping characters
+* use `!` versions for in-place modification
 
+```ruby
+>> s = 'goad cry feet hulk'
+=> "goad cry feet hulk"
 
+# one to one mapping
+>> s.tr('aeiou', '12345')
+=> "g41d cry f22t h5lk"
+
+# use - between characters to represent a range
+>> s.tr('a-f', 'A-F')
+=> "goAD Cry FEEt hulk"
+>> s.tr('aeiou', '1-5')
+=> "g41d cry f22t h5lk"
+
+# last character of 2nd arg gets re-used if 2nd arg shorter than 1st
+>> s.tr('e-jt-z', '135')
+=> "5oad cr5 3115 55lk"
+
+# ^ at start of 1st arg means translate other than given characters
+>> s.tr('^aeiou', '*')
+=> "*oa*******ee***u**"
+```
+
+* escaping special characters and squeezing
+
+```ruby
+# use - at start or end of 1st arg
+>> 'cat-bat^123'.tr('-', ':')
+=> "cat:bat^123"
+>> 'cat-bat^123'.tr('a-c-', '1-3:')
+=> "31t:21t^123"
+
+# use ^ other than first character of 1st arg
+>> 'cat-bat^123'.tr('a^c', '1*3')
+=> "31t-b1t*123"
+
+# or use \ to escape them
+>> 'cat-bat^123'.tr('\^a\-c', '*1:3')
+=> "31t:b1t*123"
+
+# to represent \ literally, it must be at end of arg
+>> 'a\bc'.tr('\\', '/')
+=> "a/bc"
+>> 'a\bc'.tr('abc\\', 'ABC/')
+=> "A/BC"
+
+# use tr_s to squeeze consecutive same character replacements
+>> 'feet food'.tr_s('fo', '12')
+=> "1eet 12d"
+```
+
+* deleting characters
+* similar to `tr`, deletes instead of translating
+* use `!` version for in-place modification
+
+```ruby
+>> s = 'foo-123:baz.'
+=> "foo-123:baz."
+
+>> s.delete('aeiou')
+=> "f-123:bz."
+>> s.delete('^a-z')
+=> "foobaz"
+
+# if multiple args are given, common characters is used to delete
+>> s.delete('abc123', '2b3o')
+=> "foo-1:az."
+# same as
+>> s.delete('23b')
+=> "foo-1:az."
+```
+
+* number of times given character(s) are present
+* similar to `delete`, returns count instead of deleting
+
+```ruby
+>> 'hello'.count('l')
+=> 2
+>> 'hello'.count('lh')
+=> 3
+
+>> 'This is a sample string'.count('i')
+=> 3
+>> 'This is a sample string'.count(' ')
+=> 4
+>> 'This is a sample string'.count('is')
+=> 7
+
+>> 'This is a sample string'.count('a-g')
+=> 4
+>> 'foo-123:baz.'.count('^a-z')
+=> 6
+>> 'foo-123:baz.'.count('abc123', '2b3o')
+=> 3
+```
 
 
