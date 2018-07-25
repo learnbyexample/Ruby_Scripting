@@ -6,6 +6,7 @@
 * [Looping](#looping)
 * [Case conversion](#case-conversion)
 * [Search and Replace](#search-and-replace)
+* [Character manipulations](#character-manipulations)
 
 <br>
 
@@ -87,7 +88,6 @@ See [ruby-doc: sprintf](https://ruby-doc.org/core-2.5.0/Kernel.html#method-i-spr
 => "foo"
 
 # left or right align string using space character
-# use ljust/rjust methods for padding with other than space character
 >> '123:%10s:456' % 'hello'
 => "123:     hello:456"
 >> '123:%-10s:456' % 'hello'
@@ -123,6 +123,31 @@ I bought 5 apples
 >> puts s
 I bought 5 apples
 => nil
+```
+
+* padding given characters(default is space) if input string length is less than specified output string size
+
+```ruby
+>> 'hello'.ljust(10)
+=> "hello     "
+>> 'hello'.ljust(10, '*')
+=> "hello*****"
+>> 'hello'.ljust(10, 'XYZ')
+=> "helloXYZXY"
+
+>> 'hello'.rjust(10)
+=> "     hello"
+>> 'hello'.rjust(10, '-')
+=> "-----hello"
+>> 'hello'.rjust(10, 'ABC')
+=> "ABCABhello"
+
+>> 'hi'.center(10)
+=> "    hi    "
+>> 'hi'.center(10, '*')
+=> "****hi****"
+>> '123'.center(10, 'ab')
+=> "aba123abab"
 ```
 
 <br>
@@ -270,6 +295,10 @@ Regular expression based processing will be covered separately in next chapter
 >> '2 be or not 2 be'.gsub('2', 'to')
 => "to be or not to be"
 ```
+
+<br>
+
+## <a name="character-manipulations"></a>Character manipulations
 
 * mapping characters
 * use `!` versions for in-place modification
