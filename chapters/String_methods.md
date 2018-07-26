@@ -7,6 +7,7 @@
 * [Case conversion](#case-conversion)
 * [Search and Replace](#search-and-replace)
 * [Character manipulations](#character-manipulations)
+* [Splitting](#splitting)
 
 <br>
 
@@ -397,6 +398,100 @@ Regular expression based processing will be covered separately in next chapter
 => 6
 >> 'foo-123:baz.'.count('abc123', '2b3o')
 => 3
+```
+
+<br>
+
+## <a name="splitting"></a>Splitting
+
+* by default, `split` uses contiguous sequence of whitespace characters to divide the given string
+    * whitespace characters are space, tab(both horizontal and vertical), newline, carriage return and form feed
+* in addition, leading and trailing whitespace characters are trimmed from input string
+* this behavior is also the case when single space character is specified as the separator
+* See [ruby-doc: split](https://ruby-doc.org/core-2.5.0/String.html#method-i-split) for details
+
+```ruby
+>> "      a  \v\f  ate b\tc   \r\n123          ".split
+=> ["a", "ate", "b", "c", "123"]
+>> "      a  \v\f  ate b\tc   \r\n123          ".split(' ')
+=> ["a", "ate", "b", "c", "123"]
+
+>> 'This is a sample string'.split
+=> ["This", "is", "a", "sample", "string"]
+>> 'This is a sample string'.split('is')
+=> ["Th", " ", " a sample string"]
+
+>> 'foo:baz:good:hi'.split(':')
+=> ["foo", "baz", "good", "hi"]
+```
+
+* a count can be given as second argument to specify max number of elements in output array
+* a negative count is needed if trailing empty fields should not be removed
+
+```ruby
+>> 'foo:baz:good:hi'.split(':', 2)
+=> ["foo", "baz:good:hi"]
+>> 'foo:baz:good:hi'.split(':', 10)
+=> ["foo", "baz", "good", "hi"]
+
+>> ',a,b,,d,,'.split(',')
+=> ["", "a", "b", "", "d"]
+>> ',a,b,,d,,'.split(',', -2)
+=> ["", "a", "b", "", "d", "", ""]
+
+>> ' a b'.split(' ', -1)
+=> ["a", "b"]
+>> ' a b   '.split
+=> ["a", "b"]
+>> ' a b   '.split(' ', -1)
+=> ["a", "b", ""]
+# use regex(covered in next chapter) to avoid default whitespace trimming
+>> ' a b   '.split(/ /, -1)
+=> ["", "a", "b", "", "", ""]
+```
+
+* when no separator is passed to `split` or if `nil` is passed as separator, value of global variable `$;` is used
+* by default, value of `$;` is `nil`
+
+```ruby
+>> $;.inspect
+=> "nil"
+
+>> 'foo bar'.split
+=> ["foo", "bar"]
+>> 'foo bar'.split(nil)
+=> ["foo", "bar"]
+
+>> $; = ':'
+=> ":"
+>> '1:2:3:4'.split
+=> ["1", "2", "3", "4"]
+>> '1:2:3:4'.split(nil)
+=> ["1", "2", "3", "4"]
+```
+
+* `partition` method splits string with given separator and returns three parts
+    * first is part of string before the first occurrence of separator
+    * second is the separator itself
+    * third is rest of the string
+* if input string doesn't contain the separator, last two elements of array will be empty string
+* `rpartition` will split based on last occurrence of separator
+
+```ruby
+>> 'good day'.partition(' ')
+=> ["good", " ", "day"]
+>> '42abc100'.partition('abc')
+=> ["42", "abc", "100"]
+>> 'foo:baz:good:hi'.partition(':')
+=> ["foo", ":", "baz:good:hi"]
+
+>> 'hi there'.partition('XYZ')
+=> ["hi there", "", ""]
+
+>> 'good day'.rpartition(' ')
+=> ["good", " ", "day"]
+>> 'foo:baz:good:hi'.rpartition(':')
+=> ["foo:baz:good", ":", "hi"]
 ```
 
 
