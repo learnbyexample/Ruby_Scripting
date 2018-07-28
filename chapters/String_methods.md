@@ -188,6 +188,77 @@ o
 => "hello"
 ```
 
+* `each_line` method will iterate by splitting the input string into records
+    * default record separator is newline character
+    * if empty string is given as separator, iteration happens over paragraphs - i.e split happens when there is one or more consecutive empty lines
+* the items so obtained every iteration will include the record separator as well
+    * for paragraph mode, more than 2 consecutive newlines are trimmed off
+* See [ruby-doc: each_line](https://ruby-doc.org/core-2.5.0/String.html#method-i-each_line) for more options and details
+
+```ruby
+>> s = "foo\nbaz\n123"
+=> "foo\nbaz\n123"
+>> s.each_line { |line| puts line.inspect }
+"foo\n"
+"baz\n"
+"123"
+=> "foo\nbaz\n123"
+
+>> 'a:b:c:'.each_line(':') { |f| puts "--#{f}--" }
+--a:--
+--b:--
+--c:--
+=> "a:b:c:"
+
+>> "1\n\n\n\n\n2\n\n3".each_line('') { |line| puts line.inspect }
+"1\n\n"
+"2\n\n"
+"3"
+=> "1\n\n\n\n\n2\n\n3"
+```
+
+* when record separator is not given while calling `each_line` method, it uses the global variable `$/` whose default value is newline character
+* the `chomp` method uses the `$/` variable as well if no argument is passed
+
+```ruby
+>> puts $/.inspect
+"\n"
+=> nil
+
+>> $/ = ':'
+=> ":"
+
+>> 'a:b:c:'.each_line { |f| puts "--#{f}--" }
+--a:--
+--b:--
+--c:--
+=> "a:b:c:"
+
+>> 'a:b:c:'.each_line { |f| puts "--#{f.chomp}--" }
+--a--
+--b--
+--c--
+=> "a:b:c:"
+```
+
+* the `lines` method is a shortcut for `each_line(sep).to_a`
+
+```ruby
+>> puts $/.inspect
+"\n"
+=> nil
+>> "foo\nbaz\n123".lines
+=> ["foo\n", "baz\n", "123"]
+
+>> '1:2:3:'.lines(':')
+=> ["1:", "2:", "3:"]
+
+>> $/ = '-'
+=> "-"
+>> 'a-b-c'.lines
+=> ["a-", "b-", "c"]
+```
+
 <br>
 
 ## <a name="condition-checks"></a>Condition checks
@@ -328,6 +399,26 @@ Regular expression based processing will be covered separately in next chapter
 => ["hi", "healing"]
 ```
 
+* deleting part of string at start/end
+* use `!` versions for in-place modification
+
+```ruby
+>> 'hello'.delete_prefix('he')
+=> "llo"
+>> 'hello'.delete_prefix('hey')
+=> "hello"
+
+>> 'history'.delete_suffix('ry')
+=> "histo"
+
+>> words = %w[spare hear rare spear]
+=> ["spare", "hear", "rare", "spear"]
+>> words.map { |w| w.delete_prefix('sp') }
+=> ["are", "hear", "rare", "ear"]
+>> words.map { |w| w.delete_suffix('re') }
+=> ["spa", "hear", "ra", "spear"]
+```
+
 * replace first/all matching string with another
 * use `!` versions for in-place modification
 
@@ -459,8 +550,8 @@ Regular expression based processing will be covered separately in next chapter
 => "g41d cry f22t h5lk"
 
 # last character of 2nd arg gets re-used if 2nd arg shorter than 1st
->> s.tr('e-jt-z', '135')
-=> "5oad cr5 3115 55lk"
+>> 'hunter2'.tr("\x00-\x7f", '*')
+=> "*******"
 
 # ^ at start of 1st arg means translate other than given characters
 >> s.tr('^aeiou', '*')
@@ -541,6 +632,7 @@ Regular expression based processing will be covered separately in next chapter
 ```
 
 * deleting whitespace characters from string start/end/both
+* use `!` versions for in-place modification
 
 ```ruby
 >> '    foo baz 123  '.strip
