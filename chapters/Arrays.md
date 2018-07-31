@@ -991,6 +991,7 @@ ArgumentError (comparison of Integer with String failed)
 * `map` allows to define a transformation function for each array element
     * use `map!` for in-place transformation
 * multiple statements can be used inside the block, value of last expression will be used to replace the element
+* `join` is covered later in [Miscellaneous](#miscellaneous) section
 
 ```ruby
 >> nums = [3, -2, 4, 1, -78, -42]
@@ -1113,6 +1114,33 @@ ArgumentError (comparison of Integer with String failed)
 => [42, "good", nil, 7, nil, "nice"]
 >> baz.compact
 => [42, "good", 7, "nice"]
+```
+
+* `join` allows to specify a separator with which to combine all the elements of array and return a single string value
+    * nested arrays get flattened, non-string values are automatically converted to string
+* if the separator is not specified or `nil` is given as separator, the value of global variable `$,` is used
+    * `$,` has `nil` as default - combines array elements without any separator between them
+    * the `print` method also uses `$,` as separator
+
+```ruby
+>> [1, 2, 3].join(':')
+=> "1:2:3"
+>> [1, nil, 3].join(':')
+=> "1::3"
+>> [42, [12, 5, 63], ['foo', [7, 6]]].join(',')
+=> "42,12,5,63,foo,7,6"
+
+>> 'hello'.chars
+=> ["h", "e", "l", "l", "o"]
+>> ["h", "e", "l", "l", "o"].join
+=> "hello"
+
+>> $, = ' - '
+=> " - "
+>> %w[apple mango guava].join
+=> "apple - mango - guava"
+>> %w[apple mango guava].join(nil)
+=> "apple - mango - guava"
 ```
 
 * `&` operator will return common elements between two arrays
