@@ -33,6 +33,8 @@
     * [Initialization](./chapters/Hashes.md#initialization), [Accessing keys and values](./chapters/Hashes.md#accessing-keys-and-values), [Looping](./chapters/Hashes.md#looping), [Modifying elements](./chapters/Hashes.md#modifying-elements), [Filtering](./chapters/Hashes.md#filtering), [Transforming keys and values](./chapters/Hashes.md#transforming-keys-and-values), [Mutable keys](./chapters/Hashes.md#mutable-keys), [Miscellaneous](./chapters/Hashes.md#miscellaneous)
 * [Set](./chapters/Set.md)
     * [Initialization](./chapters/Set.md#initialization), [Set operations](./chapters/Set.md#set-operations), [Miscellaneous](./chapters/Set.md#miscellaneous)
+* [String Methods](./chapters/String_methods.md)
+    * [String formatting](./chapters/String_methods.md#string-formatting), [Looping](./chapters/String_methods.md#looping), [Condition checks](./chapters/String_methods.md#condition-checks), [Case conversion](./chapters/String_methods.md#case-conversion), [Search and Replace](./chapters/String_methods.md#search-and-replace), [Splitting](./chapters/String_methods.md#splitting), [Character manipulations](./chapters/String_methods.md#character-manipulations), [Miscellaneous](./chapters/String_methods.md#miscellaneous)
 * [Exercises](./chapters/Exercises.md)
 
 <br>
