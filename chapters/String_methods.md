@@ -9,6 +9,31 @@
 * [Search and Replace](#search-and-replace)
 * [Splitting](#splitting)
 * [Character manipulations](#character-manipulations)
+* [Miscellaneous](#miscellaneous)
+
+<br>
+
+Some of the methods like `chomp` were covered in earlier chapters and won't be discussed here
+
+Slicing syntax is similar to arrays, see [Array slicing](./Arrays.md#slicing) section for details
+
+```ruby
+>> s = 'hello'
+=> "hello"
+
+>> s[1]
+=> "e"
+
+>> s[1..3]
+=> "ell"
+>> s[-2..-1]
+=> "lo"
+
+>> s[1..-2] = 'al'
+=> "al"
+>> s
+=> "halo"
+```
 
 <br>
 
@@ -457,6 +482,10 @@ Regular expression based processing will be covered separately in next chapter
 
 >> 'foo:baz:good:hi'.split(':')
 => ["foo", "baz", "good", "hi"]
+
+# same as: 'hello'.chars
+>> 'hello'.split('')
+=> ["h", "e", "l", "l", "o"]
 ```
 
 * a count can be given as second argument to specify max number of elements in output array
@@ -648,8 +677,171 @@ Regular expression based processing will be covered separately in next chapter
 => "hello"
 ```
 
+<br>
 
+## <a name="miscellaneous"></a>Miscellaneous
 
+* use unary `-` to get a frozen version of string
+    * use `freeze` method for in-place modification
+* use unary `+` to get a mutable version of string
 
+```ruby
+>> s = 'Hello'
+=> "Hello"
+>> s.freeze
+=> "Hello"
+>> s[0] = 'h'
+FrozenError (can't modify frozen String)
 
+>> s1 = +s
+=> "Hello"
+>> s1.downcase!
+=> "hello"
+
+>> s2 = -s1
+=> "hello"
+>> s2.upcase!
+FrozenError (can't modify frozen String)
+```
+
+* `clear` method will delete everything, does in-place modification
+
+```ruby
+>> s = 'hello'
+=> "hello"
+
+>> s.clear
+=> ""
+```
+
+* in-place concatenation
+
+```ruby
+# for single argument, << can be used
+>> s = 'hello'
+=> "hello"
+>> s << ' world'
+=> "hello world"
+
+# concat method accepts multiple arguments
+>> s.concat('. ', 'how', ' are', ' you?')
+=> "hello world. how are you?"
+
+# use prepend to add text at start
+>> 'how are you?'.prepend('hi', ' there. ')
+=> "hi there. how are you?"
+```
+
+* use `index/rindex` to know where the first/last instance of given search string occurs
+
+```ruby
+>> s = 'hi there'
+=> "hi there"
+
+>> s.index('the')
+=> 3
+>> s.index('z')
+=> nil
+
+>> s.index('e')
+=> 5
+>> s.rindex('e')
+=> 7
+
+>> s.index('h')
+=> 0
+# second argument specifies offset to start searching
+>> s.index('h', 1)
+=> 4
+# same as: s[0..3].rindex('h')
+>> s.rindex('h', 3)
+=> 0
+```
+
+* `insert` allows to add string at given index, modifies in-place
+
+```ruby
+>> 'he'.insert(0, 't')
+=> "the"
+
+>> 'he'.insert(1, 'i ther')
+=> "hi there"
+
+>> s = 'he'
+=> "he"
+$ # same as: s << 'ad'
+>> s.insert(-1, 'ad')
+=> "head"
+```
+
+* `succ` method is useful to get next alphanumeric sequence, carry over is taken care
+* if there are no alphanumeric characters, then right most character is changed
+* use `!` version for in-place modification
+
+```ruby
+>> '42'.succ
+=> "43"
+>> '42.9'.succ
+=> "43.0"
+>> '1-2-9-9'.succ
+=> "1-3-0-0"
+>> ',23,'.succ
+=> ",24,"
+
+>> 'foo'.succ
+=> "fop"
+>> 'baz'.succ
+=> "bba"
+>> 'baz9'.succ
+=> "bba0"
+
+>> '--:'.succ
+=> "--;"
+```
+
+* to iterate over an alphanumeric range
+
+```ruby
+>> 'a'.upto('c') { |c| puts c }
+a
+b
+c
+=> "a"
+
+# to exclude ending value
+>> 'x8'.upto('y2', exclusive=true) { |s| puts s }
+x8
+x9
+y0
+y1
+=> "x8"
+
+>> 'x5'.upto('x9').to_a
+=> ["x5", "x6", "x7", "x8", "x9"]
+```
+
+* `ord` gives integer ordinal value of given character
+* `codepoints` gives array of integer of each character of given string
+    * use `each_codepoints` to iterate over them
+* string concatenation methods accept integer ordinal as arguments as well
+
+```ruby
+>> 'a'.ord
+=> 97
+>> '👍'.ord
+=> 128077
+
+>> a = 'hi👍'.codepoints
+=> [104, 105, 128077]
+>> 'bye'.each_codepoint { |c| puts c }
+98
+121
+101
+=> "bye"
+
+>> 'h' << 105
+=> "hi"
+>> ''.concat(*a)
+=> "hi👍"
+```
 
