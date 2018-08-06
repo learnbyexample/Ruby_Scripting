@@ -365,7 +365,7 @@ o
 
 ## <a name="search-and-replace"></a>Search and Replace
 
-Regular expression based processing will be covered separately in next chapter
+Regular expression based processing is be covered separately in [next chapter](./Regular_expressions.md)
 
 * check whether a string is sub-string of another
 
@@ -445,6 +445,7 @@ Regular expression based processing will be covered separately in next chapter
 ```
 
 * replace first/all matching string with another
+    * `block` form is also supported
 * use `!` versions for in-place modification
 
 ```ruby
@@ -457,6 +458,17 @@ Regular expression based processing will be covered separately in next chapter
 # replace all matches
 >> '2 be or not 2 be'.gsub('2', 'to')
 => "to be or not to be"
+
+# block form illustration
+>> 'hi there'.sub('hi') { 'hello' }
+=> "hello there"
+>> 'hi there'.sub('hi') { |s| s.upcase }
+=> "HI there"
+>> 'hi there'.sub('hi') do |s|
+?>   a = 2 ** 4
+>>   "#{s.capitalize} #{a}"
+>> end
+=> "Hi 16 there"
 ```
 
 <br>
