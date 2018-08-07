@@ -7,6 +7,11 @@
 * [Anchors](#anchors)
     * [Line anchors](#line-anchors)
     * [String anchors](#string-anchors)
+    * [Word anchors](#word-anchors)
+
+<br>
+
+Examples in this chapter will deal with ASCII characters only unless otherwise specified
 
 <br>
 
@@ -182,6 +187,47 @@ hi
 => "catapults\nconcatenate\nXYZ\nsXYZ\n"
 ```
 
+* adding something to start/end of line
+
+```ruby
+>> s = "catapults\nconcatenate\ncat"
+=> "catapults\nconcatenate\ncat"
+>> puts s.gsub(/^/, '1: ')
+1: catapults
+1: concatenate
+1: cat
+
+>> puts s.gsub(/^/).with_index(1) { |m, i| "#{i}: " }
+1: catapults
+2: concatenate
+3: cat
+
+>> puts s.gsub(/$/, '.')
+catapults.
+concatenate.
+cat.
+```
+
+* if there is a newline character at end of string, there is an additional end of line match
+
+```ruby
+>> puts "a\nb\n".gsub(/^/, 'foo ')
+foo a
+foo b
+>> puts "a\n\n".gsub(/^/, 'foo ')
+foo a
+foo 
+
+>> puts "a\nb\n".gsub(/$/, ' baz')
+a baz
+b baz
+ baz
+>> puts "a\n\n".gsub(/$/, ' baz')
+a baz
+ baz
+ baz
+```
+
 <br>
 
 #### <a name="string-anchors"></a>String anchors
@@ -230,6 +276,69 @@ hi
 >> "spare\npar\ndare\n".sub(/are\Z/, 'ABC')
 => "spare\npar\ndABC\n"
 ```
+
+<br>
+
+#### <a name="word-anchors"></a>Word anchors
+
+* **word** character is any alphabet (irrespective of case), digit and the underscore character
+* word anchors help in matching or not matching boundaries of a word
+    * for example, to distinguish between `par`, `spar` and `apparent`
+* `\b` matches word boundary
+    * unlike line/string anchors, `\b` matches both start/end of word
+
+```ruby
+>> s = 'par spar apparent spare part'
+=> "par spar apparent spare part"
+
+# replace 'par' irrespective of where it occurs
+>> s.gsub(/par/, 'X')
+=> "X sX apXent sXe Xt"
+# replace 'par' only at start of word
+>> s.gsub(/\bpar/, 'X')
+=> "X spar apparent spare Xt"
+# replace 'par' only at end of word
+>> s.gsub(/par\b/, 'X')
+=> "X sX apparent spare part"
+# replace 'par' only if it is not part of another word
+>> s.gsub(/\bpar\b/, 'X')
+=> "X spar apparent spare part"
+
+# add something at word boundaries
+>> s.gsub(/\b/, ':')
+=> ":par: :spar: :apparent: :spare: :part:"
+>> puts s.gsub(/\b/, "'").gsub(/ /, ',')
+'par','spar','apparent','spare','part'
+>> puts 'foo_12a:_:3b'.gsub(/\b/, "'")
+'foo_12a':'_':'3b'
+```
+
+* `\B` is opposite of `\b`, it matches non-word boundaries
+
+```ruby
+>> s = 'par spar apparent spare part'
+=> "par spar apparent spare part"
+
+# replace 'par' if it is not start of word
+>> s.gsub(/\Bpar/, 'X')
+=> "par sX apXent sXe part"
+# replace 'par' at end of word but not whole word 'par'
+>> s.gsub(/\Bpar\b/, 'X')
+=> "par sX apparent spare part"
+# replace 'par' if it is not end of word
+>> s.gsub(/par\B/, 'X')
+=> "par spar apXent sXe Xt"
+# replace 'par' if it is surrounded by word characters
+>> s.gsub(/\Bpar\B/, 'X')
+=> "par spar apXent sXe part"
+
+# add something at non-word boundaries
+>> puts 'foo_1 3b'.gsub(/\B/, ':')
+f:o:o:_:1 3:b
+```
+
+
+
 
 
 
