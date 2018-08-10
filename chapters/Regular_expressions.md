@@ -8,6 +8,7 @@
     * [Line anchors](#line-anchors)
     * [String anchors](#string-anchors)
     * [Word anchors](#word-anchors)
+* [Alternation and Grouping](#alternation-and-grouping)
 
 <br>
 
@@ -337,8 +338,77 @@ a baz
 f:o:o:_:1 3:b
 ```
 
+<br>
 
+## <a name="alternation-and-grouping"></a>Alternation and Grouping
 
+* multiple regexps can be combined using `|` metacharacter to match either of them
+* regexp on either side of `|` can have their own independent anchors
+
+```ruby
+>> 'I like cats'.match?(/cat|dog/)
+=> true
+>> 'I like dogs'.match?(/cat|dog/)
+=> true
+>> 'I like parrots'.match?(/cat|dog/)
+=> false
+
+>> 'catapults concatenate cat scat'.gsub(/^cat|cat\b/, 'X')
+=> "Xapults concatenate X sX"
+>> 'cat dog bee parrot fox'.gsub(/cat|dog|fox/, 'mammal')
+=> "mammal mammal bee parrot mammal"
+```
+
+* beware of corner cases
+* See [regular-expressions: alternation](https://www.regular-expressions.info/alternation.html) for more info
+
+```ruby
+# for single replace regexp order doesn't matter, leftmost match is replaced
+>> 'cat dog bee parrot fox'.sub(/cat|dog/, 'mammal')
+=> "mammal dog bee parrot fox"
+>> 'cat dog bee parrot fox'.sub(/dog|cat/, 'mammal')
+=> "mammal dog bee parrot fox"
+
+# for multiple replace, regexp order matters
+# all occurrences of 'hand' gets replaced first, so no more matches
+>> 'hand handy handful'.gsub(/hand|handy|handful/, 'X')
+=> "X Xy Xful"
+# 'handy' gets replaced first, so 'hand' can still match twice more
+>> 'hand handy handful'.gsub(/handy|hand|handful/, 'X')
+=> "X X Xful"
+# 'handy' and 'handful' gets replaced before 'hand' gets a go
+>> 'hand handy handful'.gsub(/handy|handful|hand/, 'X')
+=> "X X X"
+```
+
+* common portion can be grouped inside `()`
+
+```ruby
+>> 'red reform read rest'.gsub(/reform|rest/, 'X')
+=> "red X read X"
+>> 'red reform read rest'.gsub(/re(form|st)/, 'X')
+=> "red X read X"
+
+>> 'par spare part party'.gsub(/\bpar\b|\bpart\b/, 'X')
+=> "X spare X party"
+>> 'par spare part party'.gsub(/\b(par|part)\b/, 'X')
+=> "X spare X party"
+>> 'par spare part party'.gsub(/\bpar(|t)\b/, 'X')
+=> "X spare X party"
+```
+
+* use `Regexp.union` method to build alternation from a list of arguments
+    * if argument is not a regexp, the method will try to convert it to regexp first
+
+```ruby
+>> Regexp.union('par', 'part')
+=> /par|part/
+
+>> words = %w[cat dog fox]
+=> ["cat", "dog", "fox"]
+>> 'cat dog bee parrot fox'.gsub(Regexp.union(words), 'mammal')
+=> "mammal mammal bee parrot mammal"
+```
 
 
 
