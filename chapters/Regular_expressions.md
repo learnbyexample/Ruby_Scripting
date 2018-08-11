@@ -9,6 +9,7 @@
     * [String anchors](#string-anchors)
     * [Word anchors](#word-anchors)
 * [Alternation and Grouping](#alternation-and-grouping)
+* [Escaping metacharacters](#escaping-metacharacters)
 
 <br>
 
@@ -360,7 +361,7 @@ f:o:o:_:1 3:b
 ```
 
 * beware of corner cases
-* See [regular-expressions: alternation](https://www.regular-expressions.info/alternation.html) for more info
+* See also [regular-expressions: alternation](https://www.regular-expressions.info/alternation.html)
 
 ```ruby
 # for single replace regexp order doesn't matter, leftmost match is replaced
@@ -381,7 +382,8 @@ f:o:o:_:1 3:b
 => "X X X"
 ```
 
-* common portion can be grouped inside `()`
+* common portion can be grouped inside `()` metacharacters
+* Similar to `a(b+c) = ab + ac` in maths, `a(b|c) = ab|ac` in regexp
 
 ```ruby
 >> 'red reform read rest'.gsub(/reform|rest/, 'X')
@@ -408,6 +410,74 @@ f:o:o:_:1 3:b
 => ["cat", "dog", "fox"]
 >> 'cat dog bee parrot fox'.gsub(Regexp.union(words), 'mammal')
 => "mammal mammal bee parrot mammal"
+```
+
+<br>
+
+## <a name="escaping-metacharacters"></a>Escaping metacharacters
+
+* we have seen metacharacters like `^`, `$`, `\`, `|`, `(`, etc so far
+* to match them literally, escape them by prefixing `\` character
+
+```ruby
+# even though ^ is not being used as anchor, it won't be matched literally
+>> 'cost^2 + a^5'.sub(/cost^2/) { |s| s.upcase }
+=> "cost^2 + a^5"
+# escaping will work
+>> 'cost^2 + a^5'.sub(/cost\^2/) { |s| s.upcase }
+=> "COST^2 + a^5"
+
+>> 'pa$$ed'.gsub(/\$/, 's')
+=> "passed"
+
+>> '(a*b) + c'.gsub(/\(|\)/, '')
+=> "a*b + c"
+
+>> 'a || b'.gsub(/\|/, '&')
+=> "a && b"
+
+>> '\foo\bar\baz'.gsub(/\\/, '/')
+=> "/foo/bar/baz"
+```
+
+* use `Regexp.escape` to let Ruby handle escaping all the metacharacters present in a string
+* the `sub`, `gsub` and `match?` methods automatically escape metacharacters if string is given as first argument
+
+```ruby
+>> puts Regexp.escape('(a^b)')
+\(a\^b\)
+
+>> eqn = 'f*(a^b) - 3*(a^b)'
+=> "f*(a^b) - 3*(a^b)"
+>> s = '(a^b)'
+=> "(a^b)"
+
+# string value in s variable gets converted to regexp automatically
+>> eqn.gsub(s, 'c')
+=> "f*c - 3*c"
+
+# use Regexp.escape if additional regexp features are needed
+>> eqn.gsub(/#{s}$/, 'c')
+=> "f*(a^b) - 3*(a^b)"
+>> eqn.gsub(/#{Regexp.escape(s)}$/, 'c')
+=> "f*(a^b) - 3*c"
+```
+
+* use `%r` percent string to use any other delimiter than the default `/`
+
+```ruby
+>> '/foo/bar/baz/123'.match?('o/bar/baz/1')
+=> true
+
+>> '/foo/bar/baz/123' =~ /o\/bar\/baz\/1/
+=> 3
+>> '/foo/bar/baz/123' =~ %r{o/bar/baz/1}
+=> 3
+
+>> '/foo/bar/baz/123'.sub(/o\/bar\/baz\/1/, '/c/4')
+=> "/fo/c/423"
+>> '/foo/bar/baz/123'.sub(%r(o/bar/baz/1), '/c/4')
+=> "/fo/c/423"
 ```
 
 
