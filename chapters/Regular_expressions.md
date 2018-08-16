@@ -12,6 +12,8 @@
 * [Escaping metacharacters](#escaping-metacharacters)
 * [Dot metacharacter and Quantifiers](#dot-metacharacter-and-quantifiers)
     * [Greedy quantifiers](#greedy-quantifiers)
+    * [Non-greedy quantifiers](#non-greedy-quantifiers)
+    * [Possessive quantifiers](#possessive-quantifiers)
 
 <br>
 
@@ -623,20 +625,20 @@ f:o:o:_:1 3:b
 
 # .* means any character any number of times
 # /t.*a/ would match from first 't' to last 'a' in the line
->> s.gsub(/t.*a/, 'X')
+>> s.sub(/t.*a/, 'X')
 => "Xle"
->> 'star'.gsub(/t.*a/, 'X')
+>> 'star'.sub(/t.*a/, 'X')
 => "sXr"
 
->> s.gsub(/f.*t/, 'X')
+>> s.sub(/f.*t/, 'X')
 => "that is quite a Xale"
 
 # overall regexp has to match
 # matching first 't' to last 'a' for t.*a won't work for these cases
 # so, the regexp engine backtracks until .*q matches and so on
->> s.gsub(/t.*a.*q.*f/, 'X')
+>> s.sub(/t.*a.*q.*f/, 'X')
 => "Xabricated tale"
->> s.gsub(/t.*a.*u/, 'X')
+>> s.sub(/t.*a.*u/, 'X')
 => "Xite a fabricated tale"
 ```
 
@@ -657,6 +659,65 @@ blah \< foo < bar \< blah < baz
 >> puts 'blah \< foo < bar \< blah < baz'.gsub(/\\?</, '\<')
 blah \< foo \< bar \< blah \< baz
 ```
+
+<br>
+
+#### <a name="non-greedy-quantifiers"></a>Non-greedy quantifiers
+
+* appending a `?` to greedy quantifiers will change matching from greedy to non-greedy i.e match as minimally as possible
+    * also known as lazy quantifier
+
+```ruby
+>> s = 'that is quite a fabricated tale'
+=> "that is quite a fabricated tale"
+
+>> s.sub(/t.*?a/, 'X')
+=> "Xt is quite a fabricated tale"
+>> s.sub(/f.*?t/, 'X')
+=> "that is quite a Xed tale"
+
+# overall regexp has to match
+>> s.sub(/t.*?te/, 'X')
+=> "X a fabricated tale"
+# greedy version
+>> s.sub(/t.*te/, 'X')
+=> "Xd tale"
+
+>> '123456789'.sub(/.{2,5}?/, '')
+=> "3456789"
+>> '123456789'.sub(/.{2,5}/, '')
+=> "6789"
+```
+
+<br>
+
+#### <a name="possessive-quantifiers"></a>Possessive quantifiers
+
+* appending a `+` to greedy quantifiers will change matching from greedy to possessive matching
+* it is like greedy matching but without backtracking
+    * if both greedy and possessive nature yields same results, possessive would be faster
+    * if results are different, usage depends on which one is required
+* See also [stackoverflow: Greedy vs Reluctant vs Possessive Quantifiers](https://stackoverflow.com/questions/5319840/greedy-vs-reluctant-vs-possessive-quantifiers)
+
+```ruby
+# same results, possessive would be faster
+>> 'abc ac adc abbbc'.gsub(/ab*c/, 'X')
+=> "X X adc X"
+>> 'abc ac adc abbbc'.gsub(/ab*+c/, 'X')
+=> "X X adc X"
+
+# different results
+>> 'feat ft feaeat'.gsub(/f(a|e)*at/, 'X')
+=> "X ft X"
+# (a|e)*+ would match 'a' or 'e' as much as possible
+# no backtracking, so another 'a' can never match
+>> 'feat ft feaeat'.gsub(/f(a|e)*+at/, 'X')
+=> "feat ft feaeat"
+```
+
+
+
+
 
 
 
