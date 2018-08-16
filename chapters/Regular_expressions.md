@@ -10,6 +10,8 @@
     * [Word anchors](#word-anchors)
 * [Alternation and Grouping](#alternation-and-grouping)
 * [Escaping metacharacters](#escaping-metacharacters)
+* [Dot metacharacter and Quantifiers](#dot-metacharacter-and-quantifiers)
+    * [Greedy quantifiers](#greedy-quantifiers)
 
 <br>
 
@@ -23,6 +25,7 @@ Examples in this chapter will deal with ASCII characters only unless otherwise s
     * replace something only at start/end of string
     * extract portions defined by set of characters - for ex: words, integers, floats, hex, etc
     * replace something only if it matches a surrounding condition
+    * validate string format
 * modern regular expressions implemented in high level languages support non-regular features like recursion too, so usage of the term is different than the mathematical concept
 
 **Further Reading**
@@ -360,24 +363,51 @@ f:o:o:_:1 3:b
 => "mammal mammal bee parrot mammal"
 ```
 
-* beware of corner cases
+* beware of corner cases - the regexp that matches earliest in the string wins
+
+```ruby
+>> s = 'cat dog bee parrot fox'
+=> "cat dog bee parrot fox"
+>> s.index('cat')
+=> 0
+>> s.index('dog')
+=> 4
+# index of 'cat' < index of 'dog'
+# so 'cat' will be replaced irrespective of order of regexp
+>> s.sub(/cat|dog/, 'mammal')
+=> "mammal dog bee parrot fox"
+>> s.sub(/dog|cat/, 'mammal')
+=> "mammal dog bee parrot fox"
+
+# if the result is confusing, unroll gsub loop to two sub
+# and calculate index for both regexp before each sub
+>> 'far fear'.gsub(/ar|ear/, 'Y')
+=> "fY fY"
+>> 'far fear'.gsub(/ear|ar/, 'Y')
+=> "fY fY"
+```
+
+* if index is same, then precedence is left to right
 * See also [regular-expressions: alternation](https://www.regular-expressions.info/alternation.html)
 
 ```ruby
-# for single replace regexp order doesn't matter, leftmost match is replaced
->> 'cat dog bee parrot fox'.sub(/cat|dog/, 'mammal')
-=> "mammal dog bee parrot fox"
->> 'cat dog bee parrot fox'.sub(/dog|cat/, 'mammal')
-=> "mammal dog bee parrot fox"
+>> s = 'handful'
+=> "handful"
+>> s.index('hand')
+=> 0
+>> s.index('handful')
+=> 0
+>> s.sub(/hand|handful/, 'X')
+=> "Xful"
+>> s.sub(/handful|hand/, 'X')
+=> "X"
 
-# for multiple replace, regexp order matters
-# all occurrences of 'hand' gets replaced first, so no more matches
+# if the result is confusing, unroll gsub loop to multiple sub
+# and calculate index for all three regexps before each sub
 >> 'hand handy handful'.gsub(/hand|handy|handful/, 'X')
 => "X Xy Xful"
-# 'handy' gets replaced first, so 'hand' can still match twice more
 >> 'hand handy handful'.gsub(/handy|hand|handful/, 'X')
 => "X X Xful"
-# 'handy' and 'handful' gets replaced before 'hand' gets a go
 >> 'hand handy handful'.gsub(/handy|handful|hand/, 'X')
 => "X X X"
 ```
@@ -441,7 +471,7 @@ f:o:o:_:1 3:b
 ```
 
 * use `Regexp.escape` to let Ruby handle escaping all the metacharacters present in a string
-* the `sub`, `gsub` and `match?` methods automatically escape metacharacters if string is given as first argument
+* to avoid escaping altogether, use string argument instead of regexp when regexp features are not needed
 
 ```ruby
 >> puts Regexp.escape('(a^b)')
@@ -452,7 +482,6 @@ f:o:o:_:1 3:b
 >> s = '(a^b)'
 => "(a^b)"
 
-# string value in s variable gets converted to regexp automatically
 >> eqn.gsub(s, 'c')
 => "f*c - 3*c"
 
@@ -480,6 +509,154 @@ f:o:o:_:1 3:b
 => "/fo/c/423"
 ```
 
+<br>
+
+## <a name="dot-metacharacter-and-quantifiers"></a>Dot metacharacter and Quantifiers
+
+* the `.` metacharacter matches any character except newline character
+    * later on, we'll see how to match newline as well
+
+```ruby
+>> 'tac tin cat abc;tuv acute'.gsub(/c.t/, 'X')
+=> "taXin X abXuv aXe"
+
+>> 'breadth markedly reported overrides'.gsub(/r..d/) { |s| s.upcase }
+=> "bREADth maRKEDly repoRTED oveRRIDes"
+
+>> "42\t33".sub(/2.3/, '8')
+=> "483"
+```
+
+<br>
+
+#### <a name="greedy-quantifiers"></a>Greedy quantifiers
+
+* quantifiers help to specify how many times to match a character or grouping
+* the `?` quantifier will match `0` or `1` times
+
+```ruby
+# same as: /far|fear/
+>> 'far feat flare fear'.gsub(/fe?ar/, 'X')
+=> "X feat flare X"
+# same as: /ear|ar/
+>> 'far feat flare fear'.gsub(/e?ar/, 'X')
+=> "fX feat flXe fX"
+
+# same as: /\bpar(t|)\b/
+>> 'par spare part party'.gsub(/\bpart?\b/, 'X')
+=> "X spare X party"
+
+# same as: /\b(re.d|red)\b/
+>> 'red read ready re;d redo reed'.gsub(/\bre.?d\b/, 'X')
+=> "X X ready X redo X"
+
+# same as: /part|parrot/
+>> 'par part parrot parent'.gsub(/par(ro)?t/, 'X')
+=> "par X X parent"
+# same as: /part|parrot|parent/
+>> 'par part parrot parent'.gsub(/par(en|ro)?t/, 'X')
+=> "par X X X"
+```
+
+* the `*` quantifier will match `0` or more times
+
+```ruby
+>> 'tr tear tare steer sitaara'.gsub(/ta*r/, 'X')
+=> "X tear Xe steer siXa"
+>> 'tr tear tare steer sitaara'.gsub(/t(e|a)*r/, 'X')
+=> "X X Xe sX siXa"
+
+>> '3111111111125111142'.gsub(/1*2/, 'X')
+=> "3X511114X"
+
+>> '3111111111125111142'.split(/1*/)
+=> ["3", "2", "5", "4", "2"]
+>> '3111111111125111142'.split(/1*/, -1)
+=> ["3", "2", "5", "4", "2", ""]
+```
+
+* the `+` quantifier will match `1` or more times
+
+```ruby
+>> 'tr tear tare steer sitaara'.gsub(/ta+r/, 'X')
+=> "tr tear Xe steer siXa"
+>> 'tr tear tare steer sitaara'.gsub(/t(e|a)+r/, 'X')
+=> "tr X Xe sX siXa"
+
+>> '3111111111125111142'.gsub(/1+2/, 'X')
+=> "3X5111142"
+>> '3111111111125111142'.split(/1+/)
+=> ["3", "25", "42"]
+```
+
+* the `{}` quantifier forms allow using numbers
+    * `{m, n}` will match `m` to `n` times
+    * `{m,}` will match at least `m` times
+    * `{,n}` will match up to `n` times (including `0` times)
+    * `{n}` will match exactly `n` times
+
+```ruby
+>> s = 'abc ac adc abbc bbb bc abbbbbc'
+=> "abc ac adc abbc bbb bc abbbbbc"
+
+>> s.gsub(/ab{1,4}c/, 'X')
+=> "X ac adc X bbb bc abbbbbc"
+
+>> s.gsub(/ab{2,}c/, 'X')
+=> "abc ac adc X bbb bc X"
+
+>> s.gsub(/ab{,3}c/, 'X')
+=> "X X adc X bbb bc abbbbbc"
+
+>> s.gsub(/ab{2}c/, 'X')
+=> "abc ac adc X bbb bc abbbbbc"
+```
+
+* the quantifiers we've seen so far are all greedy in nature
+* other than `{n}`, rest of them can match varying quantities of preceding character or group
+* so, in cases where there can be multiple ways to satisfy the regexp, the longest match would win
+    * See also [ruby-doc: Regexp Performance](https://ruby-doc.org/core-2.5.0/Regexp.html#class-Regexp-label-Performance)
+
+```ruby
+>> s = 'that is quite a fabricated tale'
+=> "that is quite a fabricated tale"
+
+# .* means any character any number of times
+# /t.*a/ would match from first 't' to last 'a' in the line
+>> s.gsub(/t.*a/, 'X')
+=> "Xle"
+>> 'star'.gsub(/t.*a/, 'X')
+=> "sXr"
+
+>> s.gsub(/f.*t/, 'X')
+=> "that is quite a Xale"
+
+# overall regexp has to match
+# matching first 't' to last 'a' for t.*a won't work for these cases
+# so, the regexp engine backtracks until .*q matches and so on
+>> s.gsub(/t.*a.*q.*f/, 'X')
+=> "Xabricated tale"
+>> s.gsub(/t.*a.*u/, 'X')
+=> "Xite a fabricated tale"
+```
+
+* longest match wins nature of greedy quantifier is preferable over equivalent regexp defined using alternation 
+
+```ruby
+# same as: /handy|handful|hand/
+>> 'hand handy handful'.gsub(/hand(y|ful)?/, 'X')
+=> "X X X"
+
+# same as: /ear|ar/
+>> 'far fear'.gsub(/e?ar/, 'Y')
+=> "fY fY"
+
+>> puts 'blah \< foo < bar \< blah < baz'
+blah \< foo < bar \< blah < baz
+# same as: /\\<|</
+>> puts 'blah \< foo < bar \< blah < baz'.gsub(/\\?</, '\<')
+blah \< foo \< bar \< blah \< baz
+```
 
 
 
