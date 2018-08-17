@@ -14,6 +14,7 @@
     * [Greedy quantifiers](#greedy-quantifiers)
     * [Non-greedy quantifiers](#non-greedy-quantifiers)
     * [Possessive quantifiers](#possessive-quantifiers)
+* [match, scan and globals](#match-scan-and-globals)
 
 <br>
 
@@ -570,6 +571,10 @@ f:o:o:_:1 3:b
 
 >> '3111111111125111142'.gsub(/1*2/, 'X')
 => "3X511114X"
+>> '3111111111125111142'.partition(/1*2/)
+=> ["3", "11111111112", "5111142"]
+>> '3111111111125111142'.rpartition(/1*2/)
+=> ["311111111112511114", "2", ""]
 
 >> '3111111111125111142'.split(/1*/)
 => ["3", "2", "5", "4", "2"]
@@ -715,10 +720,162 @@ blah \< foo \< bar \< blah \< baz
 => "feat ft feaeat"
 ```
 
+<br>
 
+## <a name="match-scan-and-globals"></a>match, scan and globals
 
+* similar to `match?`, the `match` method accepts a regexp and optional starting index
+* the return value is of type `MatchData`
+    * See [ruby-doc: MatchData](https://ruby-doc.org/core-2.5.0/MatchData.html) for details
 
+```ruby
+>> 'abc ac adc abbbc'.match(/ab*c/)
+=> #<MatchData "abc">
+>> 'abc ac adc abbbc'.match(/ab*c/)[0]
+=> "abc"
 
+>> 'abc ac adc abbbc'.match(/ab*c/, 1)
+=> #<MatchData "ac">
+>> 'abc ac adc abbbc'.match(/ab*c/, 1)[0]
+=> "ac"
 
+>> 'abc ac adc abbbc'.match(/ab*c/, 7)
+=> #<MatchData "abbbc">
+>> 'abc ac adc abbbc'.match(/ab*c/, 7)[0]
+=> "abbbc"
+```
+
+* another way to get first matched string is providing regexp instead of string indexing
+    * but this won't allow to specify starting index
+
+```ruby
+>> s = 'abc ac adc abbbc'
+=> "abc ac adc abbbc"
+
+>> s[/ab*c/]
+=> "abc"
+
+>> s[/ab{2,}c/]
+=> "abbbc"
+```
+
+* `scan` method returns all the matched strings as an array
+
+```ruby
+>> 'abc ac adc abbbc'.scan(/ab*c/)
+=> ["abc", "ac", "abbbc"]
+>> 'abc ac adc abbbc'.scan(/ab+c/)
+=> ["abc", "abbbc"]
+>> 'par spar apparent spare part'.scan(/\bs?pare?\b/)
+=> ["par", "spar", "spare"]
+
+# greedy vs non-greedy
+>> 'that is quite a fabricated tale'.scan(/t.*a/)
+=> ["that is quite a fabricated ta"]
+>> 'that is quite a fabricated tale'.scan(/t.*?a/)
+=> ["tha", "t is quite a", "ted ta"]
+
+# use block to iterate over matched strings
+>> 'abc ac adc abbbc'.scan(/ab+c/) { |s| puts s.upcase }
+ABC
+ABBBC
+```
+
+* global variables also hold information related to matched data
+    * as noted before, `match?` method won't affect these variables
+* `$~` contains `MatchData`
+* <code>$`</code> contains string before the matched string
+* `$&` contains matched string
+* `$'` contains string after the matched string
+
+```ruby
+>> s = 'that is quite a fabricated tale'
+=> "that is quite a fabricated tale"
+
+>> s =~ /q.*b/
+=> 8
+
+>> $~
+=> #<MatchData "quite a fab">
+>> $~[0]
+=> "quite a fab"
+
+>> $`
+=> "that is "
+>> $&
+=> "quite a fab"
+>> $'
+=> "ricated tale"
+```
+
+* above variables will have info related to last match in case of scan/gsub/etc
+
+```ruby
+>> 'par spar apparent spare part'.scan(/\b(par|spare)\b/)
+=> [["par"], ["spare"]]
+
+>> $~
+=> #<MatchData "spare" 1:"spare">
+
+>> $`
+=> "par spar apparent "
+>> $&
+=> "spare"
+>> $'
+=> " part"
+```
+
+* `$1` will have string matched by first group
+* `$2` will have string matched by second group and so on
+* `$+` will have string matched by last group
+* default value is `nil` if the group number didn't have a match
+
+```ruby
+>> s = 'that is quite a fabricated tale'
+=> "that is quite a fabricated tale"
+
+>> s =~ /(th.*q).*(b.*c)/
+=> 0
+>> $1
+=> "that is q"
+>> $2
+=> "bric"
+>> $+
+=> "bric"
+
+>> s =~ /s.*(q.*(f.*b).*c).*d/
+=> 6
+>> $&
+=> "s quite a fabricated"
+>> $1
+=> "quite a fabric"
+>> $2
+=> "fab"
+```
+
+* group data can also be retrieved from MatchData
+
+```ruby
+>> s = 'that is quite a fabricated tale'
+=> "that is quite a fabricated tale"
+>> s =~ /(q.*(f.*b).*c).*d/
+=> 8
+
+>> $~
+=> #<MatchData "quite a fabricated" 1:"quite a fabric" 2:"fab">
+>> $~.to_a
+=> ["quite a fabricated", "quite a fabric", "fab"]
+>> $~[1]
+=> "quite a fabric"
+
+>> s[/(q.*(f.*b).*c).*d/]
+=> "quite a fabricated"
+>> s[/(q.*(f.*b).*c).*d/, 0]
+=> "quite a fabricated"
+>> s[/(q.*(f.*b).*c).*d/, 1]
+=> "quite a fabric"
+>> s[/(q.*(f.*b).*c).*d/, 2]
+=> "fab"
+```
 
 
