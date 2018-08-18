@@ -932,7 +932,7 @@ ABBBC
 
 * some simple cases of numeric range can be constructed using character class
     * use block form for the rest
-* See also [Matching Numeric Ranges with a Regular Expression](https://www.regular-expressions.info/numericranges.html)
+* See also [regular-expressions: matching numeric ranges](https://www.regular-expressions.info/numericranges.html)
 
 ```ruby
 # numbers between 10 to 29
@@ -969,7 +969,7 @@ ABBBC
 # filtering words without vowels
 >> words = %w[tryst glyph pity why]
 => ["tryst", "glyph", "pity", "why"]
-# can also use: { |w| w =~ /\b[^aeiou]+\b/ }
+# can also use: { |w| w =~ /\b[^aeiou]+\b/ } or { |w| w !~ /[aeiou]/ }
 >> words.select { |w| w.match?(/\b[^aeiou]+\b/) }
 => ["tryst", "glyph", "why"]
 ```
@@ -978,12 +978,67 @@ ABBBC
 
 ```ruby
 # [^aeiou] will match any non-vowel character
+# which means space is also a valid character to be matched
 >> 'tryst glyph pity why'.scan(/\b[^aeiou]+\b/)
 => ["tryst glyph ", " why"]
 
 # [a-z&&[^aeiou]] will be intersection of a-z and non-vowel characters
+# so, we get a positive definition of characters to match and avoids surprises
 >> 'tryst glyph pity why'.scan(/\b[a-z&&[^aeiou]]+\b/)
 => ["tryst", "glyph", "why"]
+```
+
+* escaping character class metacharacters
+
+```ruby
+# - should be first or last character or escaped using \
+>> 'ab-cd gh-c 12-423'.scan(/\b[a-z-]{2,}\b/)
+=> ["ab-cd", "gh-c"]
+>> 'ab-cd gh-c 12-423'.scan(/\b[a-z\-0-9]{2,}\b/)
+=> ["ab-cd", "gh-c", "12-423"]
+
+# ^ should be other than first character or escaped using \
+>> 'f*(a^b) - 3*(a+b)'.scan(/a[+^]b/)
+=> ["a^b", "a+b"]
+>> 'f*(a^b) - 3*(a+b)'.scan(/a[\^+]b/)
+=> ["a^b", "a+b"]
+
+# [, ] and \ should be escaped using \
+>> 'a[5]24 bcd'.match(/[\[0-9]+/)
+=> #<MatchData "[5">
+>> 'a[5]24 bcd'.match(/[\]0-9]+/)
+=> #<MatchData "5]24">
+>> puts '5ba\babc2'.match(/[a\\b]+/)
+ba\bab
+```
+
+* commonly used character sets have predefined escape sequences
+    * `\w` is equivalent to `[A-Za-z0-9_]` for matching word characters
+    * `\d` is equivalent to `[0-9]` for matching digit characters
+    * `\s` is equivalent to `[ \t\r\n\f\v]` for matching whitespace characters
+    * `\h` is equivalent to `[0-9a-fA-F]` for matching hexadecimal characters
+    * `\W`, `\D`, `\S`, `\H`, respectively for their negated character class
+
+```ruby
+>> '128A foo1 fe32 34 bar'.scan(/\b\h+\b/)
+=> ["128A", "fe32", "34"]
+>> '128A foo1 fe32 34 bar'.scan(/\b\h+\b/).map(&:hex)
+=> [4746, 65074, 52]
+
+>> 'foo=5, bar=3; x=83, y=120'.scan(/\d+/).map(&:to_i)
+=> [5, 3, 83, 120]
+>> 'Sample123string54with908numbers'.split(/\d+/)
+=> ["Sample", "string", "with", "numbers"]
+>> 'like 42 and 37.'.gsub(/\D+/, 'X')
+=> "X42X37X"
+
+>> 'foo:ab12:baz_3:_::t2'.scan(/\w+/)
+=> ["foo", "ab12", "baz_3", "_", "t2"]
+
+>> "      a  \v\f  ate b\tc   \r\n123          ".split
+=> ["a", "ate", "b", "c", "123"]
+>> "      a  \v\f  ate b\tc   \r\n123          ".split(/\s+/, -1)
+=> ["", "a", "ate", "b", "c", "123", ""]
 ```
 
 
