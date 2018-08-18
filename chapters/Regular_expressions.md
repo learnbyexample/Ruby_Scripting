@@ -15,6 +15,7 @@
     * [Non-greedy quantifiers](#non-greedy-quantifiers)
     * [Possessive quantifiers](#possessive-quantifiers)
 * [match, scan and globals](#match-scan-and-globals)
+* [Character class](#character-class)
 
 <br>
 
@@ -725,7 +726,8 @@ blah \< foo \< bar \< blah \< baz
 ## <a name="match-scan-and-globals"></a>match, scan and globals
 
 * similar to `match?`, the `match` method accepts a regexp and optional starting index
-* the return value is of type `MatchData`
+    * both these methods treat string argument as a regexp, unlike sub/split/etc
+* the return value is of type `MatchData` from which various information can be extracted
     * See [ruby-doc: MatchData](https://ruby-doc.org/core-2.5.0/MatchData.html) for details
 
 ```ruby
@@ -734,9 +736,10 @@ blah \< foo \< bar \< blah \< baz
 >> 'abc ac adc abbbc'.match(/ab*c/)[0]
 => "abc"
 
->> 'abc ac adc abbbc'.match(/ab*c/, 1)
+# string argument is treated same as a regexp
+>> 'abc ac adc abbbc'.match('ab*c', 1)
 => #<MatchData "ac">
->> 'abc ac adc abbbc'.match(/ab*c/, 1)[0]
+>> 'abc ac adc abbbc'.match('ab*c', 1)[0]
 => "ac"
 
 >> 'abc ac adc abbbc'.match(/ab*c/, 7)
@@ -745,8 +748,7 @@ blah \< foo \< bar \< blah \< baz
 => "abbbc"
 ```
 
-* another way to get first matched string is providing regexp instead of string indexing
-    * but this won't allow to specify starting index
+* another way to get matched string is providing regexp within `[]` on a string value
 
 ```ruby
 >> s = 'abc ac adc abbbc'
@@ -754,6 +756,8 @@ blah \< foo \< bar \< blah \< baz
 
 >> s[/ab*c/]
 => "abc"
+>> s[1..-1][/ab*c/]
+=> "ac"
 
 >> s[/ab{2,}c/]
 => "abbbc"
@@ -791,7 +795,6 @@ ABBBC
 ```ruby
 >> s = 'that is quite a fabricated tale'
 => "that is quite a fabricated tale"
-
 >> s =~ /q.*b/
 => 8
 
@@ -799,7 +802,6 @@ ABBBC
 => #<MatchData "quite a fab">
 >> $~[0]
 => "quite a fab"
-
 >> $`
 => "that is "
 >> $&
@@ -808,15 +810,19 @@ ABBBC
 => "ricated tale"
 ```
 
-* above variables will have info related to last match in case of scan/gsub/etc
+* for multiple matches, global variables will update for every match
 
 ```ruby
->> 'par spar apparent spare part'.scan(/\b(par|spare)\b/)
-=> [["par"], ["spare"]]
+# same as: { |s| puts s.upcase }
+>> 'abc ac adc abbbc'.scan(/ab+c/) { puts $&.upcase }
+ABC
+ABBBC
 
+# referring to them after the instruction will have info only for last match
+>> 'par spar apparent spare part'.scan(/\bpar\b|\bspare\b/)
+=> ["par", "spare"]
 >> $~
-=> #<MatchData "spare" 1:"spare">
-
+=> #<MatchData "spare">
 >> $`
 => "par spar apparent "
 >> $&
@@ -854,6 +860,7 @@ ABBBC
 ```
 
 * group data can also be retrieved from MatchData
+* negative index can be used, makes it easier to get last match, second last, etc
 
 ```ruby
 >> s = 'that is quite a fabricated tale'
@@ -865,7 +872,7 @@ ABBBC
 => #<MatchData "quite a fabricated" 1:"quite a fabric" 2:"fab">
 >> $~.to_a
 => ["quite a fabricated", "quite a fabric", "fab"]
->> $~[1]
+>> $~[-2]
 => "quite a fabric"
 
 >> s[/(q.*(f.*b).*c).*d/]
@@ -877,5 +884,110 @@ ABBBC
 >> s[/(q.*(f.*b).*c).*d/, 2]
 => "fab"
 ```
+
+<br>
+
+## <a name="character-class"></a>Character class
+
+* `.` meta character provides a way to match any character
+* character class provides a way to match any character among a specified set of characters enclosed within `[]`
+* quantifiers applies to characters class as well
+
+```ruby
+# same as: /c(o|u)t/
+>> 'cut cat cot coat'.gsub(/c[ou]t/, 'X')
+=> "X cat X coat"
+
+# same as: /(a|o)+t/
+>> 'oat ft boa foot'.gsub(/[ao]+t/, 'X')
+=> "X ft boa fX"
+
+>> 'foo5932baz'.sub(/[0123456789]+/, '')
+=> "foobaz"
+```
+
+* matching any alphabet, number, hexadecimal number etc becomes cumbersome if every character has to be individually specified
+* so, there's a shortcut, using `-` to construct a range
+
+```ruby
+>> 'foo5932baz'.sub(/[0-9]+/, '')
+=> "foobaz"
+
+# whole words made up of lowercase alphabets only
+>> 'coat Bin food tar12 best'.scan(/\b[a-z]+\b/)
+=> ["coat", "food", "best"]
+
+# whole words made up of lowercase alphabets and digits only
+>> 'coat Bin food tar12 best'.scan(/\b[a-z0-9]+\b/)
+=> ["coat", "food", "tar12", "best"]
+
+# whole words made up of lowercase alphabets, starting with p to z
+>> 'coat tin food put stoop best'.scan(/\b[p-z][a-z]+\b/)
+=> ["tin", "put", "stoop"]
+
+# whole words made up of a to f, p to t lowercase alphabets
+>> 'coat tin food put stoop best'.scan(/\b[a-fp-t]+\b/)
+=> ["best"]
+```
+
+* some simple cases of numeric range can be constructed using character class
+    * use block form for the rest
+* See also [Matching Numeric Ranges with a Regular Expression](https://www.regular-expressions.info/numericranges.html)
+
+```ruby
+# numbers between 10 to 29
+>> '23 154 12 26 98234'.scan(/\b[12][0-9]\b/)
+=> ["23", "12", "26"]
+
+# numbers >= 100
+>> '23 154 12 26 98234'.scan(/\b[0-9]{3,}\b/)
+=> ["154", "98234"]
+
+# numbers >= 100 if there are leading zeros
+>> '0501 035 154 12 26 98234'.scan(/\b0*[1-9][0-9]{2,}\b/)
+=> ["0501", "154", "98234"]
+
+>> '45 349 651 593 4 204'.gsub(/[0-9]+/) { $&.to_i < 350 ? 0 : 1 }
+=> "0 0 1 1 0 0"
+```
+
+* character class has its own set of metacharacters
+* we've already seen `-` which helps to form a range
+* using `^` as first character inside `[]` will result in matching characters other than those specified
+
+```ruby
+# deleting characters from start of line based on a delimiter
+>> 'foo=42; baz=123'.sub(/^[^=]+/, '')
+=> "=42; baz=123"
+>> 'foo=42; baz=123'.sub(/^[^=]+=/, '')
+=> "42; baz=123"
+
+# deleting characters at end of line based on a delimiter
+>> 'foo=42; baz=123'.sub(/=[^=]+$/, '')
+=> "foo=42; baz"
+
+# filtering words without vowels
+>> words = %w[tryst glyph pity why]
+=> ["tryst", "glyph", "pity", "why"]
+# can also use: { |w| w =~ /\b[^aeiou]+\b/ }
+>> words.select { |w| w.match?(/\b[^aeiou]+\b/) }
+=> ["tryst", "glyph", "why"]
+```
+
+* use `&&` to define intersection of two or more character classes
+
+```ruby
+# [^aeiou] will match any non-vowel character
+>> 'tryst glyph pity why'.scan(/\b[^aeiou]+\b/)
+=> ["tryst glyph ", " why"]
+
+# [a-z&&[^aeiou]] will be intersection of a-z and non-vowel characters
+>> 'tryst glyph pity why'.scan(/\b[a-z&&[^aeiou]]+\b/)
+=> ["tryst", "glyph", "why"]
+```
+
+
+
+
 
 
