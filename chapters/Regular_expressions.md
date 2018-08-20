@@ -1017,7 +1017,7 @@ ba\bab
     * `\d` is equivalent to `[0-9]` for matching digit characters
     * `\s` is equivalent to `[ \t\r\n\f\v]` for matching whitespace characters
     * `\h` is equivalent to `[0-9a-fA-F]` for matching hexadecimal characters
-    * `\W`, `\D`, `\S`, `\H`, respectively for their negated character class
+    * `\W`, `\D`, `\S` and `\H` respectively for their negated character class
 
 ```ruby
 >> '128A foo1 fe32 34 bar'.scan(/\b\h+\b/)
@@ -1032,13 +1032,40 @@ ba\bab
 >> 'like 42 and 37.'.gsub(/\D+/, 'X')
 => "X42X37X"
 
->> 'foo:ab12:baz_3:_::t2'.scan(/\w+/)
-=> ["foo", "ab12", "baz_3", "_", "t2"]
+>> "foo:ab 12:baz_3:_:::par\tpool".scan(/\w+/)
+=> ["foo", "ab", "12", "baz_3", "_", "par", "pool"]
+>> "foo:ab 12:baz_3:_:::par\tpool".scan(/[\w\s]+/)
+=> ["foo", "ab 12", "baz_3", "_", "par\tpool"]
 
 >> "      a  \v\f  ate b\tc   \r\n123          ".split
 => ["a", "ate", "b", "c", "123"]
 >> "      a  \v\f  ate b\tc   \r\n123          ".split(/\s+/, -1)
 => ["", "a", "ate", "b", "c", "123", ""]
+```
+
+* Ruby also provides named character sets, which are unicode aware unlike the escape sequences which only work on ASCII characters
+    * a named character set is defined by a name enclosed between `[:` and `:]` and has to be used within a character class `[]`, along with any other character as needed
+* only some examples for ASCII input given below, see [ruby-doc: Character Classes](https://ruby-doc.org/core-2.5.0/Regexp.html#class-Regexp-label-Character+Classes) for more details and other named character sets
+
+```ruby
+# similar to: /\d+/ or /[0-9]+/
+>> 'foo=5, bar=3; x=83, y=120'.scan(/[[:digit:]]+/)
+=> ["5", "3", "83", "120"]
+# similar to: /\D+/ or /[^0-9]+/
+>> 'like 42 and 37.'.gsub(/[^[:digit:]]+/, 'X')
+=> "X42X37X"
+
+# similar to: /[\w\s]+/
+>> "foo:ab 12:baz_3:_:::par\tpool".scan(/[[:word:][:space:]]+/)
+=> ["foo", "ab 12", "baz_3", "_", "par\tpool"]
+
+# similar to: /[a-zA-Z]+/
+>> 'Sample123string54with908numbers'.scan(/[[:alpha:]]+/)
+=> ["Sample", "string", "with", "numbers"]
+
+# remove all punctuation characters
+>> 'hi there! how are you?? all fine here.'.gsub(/[[:punct:]]+/, '')
+=> "hi there how are you all fine here"
 ```
 
 
