@@ -16,6 +16,8 @@
     * [Possessive quantifiers](#possessive-quantifiers)
 * [match, scan and globals](#match-scan-and-globals)
 * [Character class](#character-class)
+* [Groupings and backreferences](#groupings-and-backreferences)
+    * [Non-capturing groups](#non-capturing-groups)
 
 <br>
 
@@ -961,6 +963,9 @@ ABBBC
 => "=42; baz=123"
 >> 'foo=42; baz=123'.sub(/^[^=]+=/, '')
 => "42; baz=123"
+# remove first two columns where : is delimiter
+>> 'foo:123:bar:baz'.sub(/^([^:]+:){2}/, '')
+=> "bar:baz"
 
 # deleting characters at end of line based on a delimiter
 >> 'foo=42; baz=123'.sub(/=[^=]+$/, '')
@@ -1068,8 +1073,109 @@ ba\bab
 => "hi there how are you all fine here"
 ```
 
+<br>
 
+## <a name="groupings-and-backreferences"></a>Groupings and backreferences
 
+* the regexp grouping within `()` we've seen so far are also referred to as **capture groups**
+* the string value that is matched by such groups can be referred outside the regexp using global variables `$1`, `$2`, etc
+* they can be referred within the regexp itself using backreferences as `\1`, `\2`, etc
+    * `\1`, `\2` upto `\9` can be used in replacement sections of `sub/gsub` when block form is not needed
+    * `\0` would refer to entire matched string, equivalent to `$&`
+* *Note* that the matched string is referenced, not the regexp itself
+    * for ex: if `([0-9][a-f])` matches `3b`, then backreferencing will be `3b` not any other valid match of the regular expression like `8f`, `0a` etc
+
+```ruby
+# remove quotes surrounding digits
+>> '"52" apples and "31" mangoes'.gsub(/"(\d+)"/, '\1')
+=> "52 apples and 31 mangoes"
+# replace __ with _ and delete _ if it is alone
+>> '_foo_ __123__ _baz_'.gsub(/(_)?_/, '\1')
+=> "foo _123_ baz"
+
+# add something around the matched strings
+>> '52 apples and 31 mangoes'.gsub(/\d+/, '(\0)')
+=> "(52) apples and (31) mangoes"
+>> 'Hello world'.sub(/.*/, 'Hi. \0. Have a nice day')
+=> "Hi. Hello world. Have a nice day"
+
+# swap words separated by a comma
+>> 'a,b 42,64'.gsub(/(\w+),(\w+)/, '\2,\1')
+=> "b,a 64,42"
+
+# replace words having a consecutive repeated character
+>> 'eel flee all pat ilk seen'.gsub(/\b\w*(\w)\1\w*\b/, 'X')
+=> "X X X pat ilk X"
+# remove any number of consecutive duplicate words separated by space
+>> 'a a a walking for for a cause'.gsub(/\b(\w+)( \1)+\b/, '\1')
+=> "a walking for a cause"
+```
+
+* using capture groups affects behavior of string methods like `scan` and `split`
+
+```ruby
+# without capture group
+>> 'Sample123string54with908numbers'.split(/\d+/)
+=> ["Sample", "string", "with", "numbers"]
+# to include the matching delimiter strings as well in the output
+>> 'Sample123string54with908numbers'.split(/(\d+)/)
+=> ["Sample", "123", "string", "54", "with", "908", "numbers"]
+
+# only the string matched within groups will be in output
+>> '_foo_ cat _123_ _baz_ dog'.scan(/_(\w+)_/)
+=> [["foo"], ["123"], ["baz"]]
+# each element is an array containing all the groups
+>> 'a:b 42:64'.scan(/(\w+):(\w+)/)
+=> [["a", "b"], ["42", "64"]]
+>> 'a:b c: 42:64'.scan(/(\w+):(\w*)/)
+=> [["a", "b"], ["c", ""], ["42", "64"]]
+```
+
+<br>
+
+#### <a name="non-capturing-groups"></a>Non-capturing groups
+
+* use `(?:)` instead of `()` to group regexps without capturing it
+* such groups won't be counted for backreference/global variables
+
+```ruby
+# normal capture group will hinder ability to get whole match
+>> 'cost tin food put shin best'.scan(/\b\w*(st|in)\b/)
+=> [["st"], ["in"], ["in"], ["st"]]
+# non-capturing group to the rescue
+>> 'cost tin food put shin best'.scan(/\b\w*(?:st|in)\b/)
+=> ["cost", "tin", "shin", "best"]
+
+# with normal grouping, need to keep track of all the groups
+>> '1,2,3,4,5,6,7'.sub(/^(([^,]+,){3})([^,]+)/, '\1(\3)')
+=> "1,2,3,(4),5,6,7"
+# using non-capturing groups, only relevant groups have to be tracked
+>> '1,2,3,4,5,6,7'.sub(/^((?:[^,]+,){3})([^,]+)/, '\1(\2)')
+=> "1,2,3,(4),5,6,7"
+
+>> 'foo:-:abc34baz25tar:-:par'.split(/(?:\d+|:-:)/)
+=> ["foo", "abc", "baz", "tar", "par"]
+```
+
+* but if regexp itself needs backreference, capture group cannot be avoided
+* in such cases, `gsub` comes in handy instead of `scan`
+    * without a 2nd argument or block, `gsub` returns an Enumerator which can be used as needed
+
+```ruby
+# same as: scan(/\b\w*(?:st|in)\b/)
+>> 'cost peel tin food put shin best'.gsub(/\b\w*(st|in)\b/).to_a
+=> ["cost", "tin", "shin", "best"]
+
+# same as: scan(/\b\w*(?:st|in)\b/).map(&:upcase)
+>> 'cost peel tin food put shin best'.gsub(/\b\w*(st|in)\b/).map(&:upcase)
+=> ["COST", "TIN", "SHIN", "BEST"]
+
+# get all words containing consecutive repeated characters
+>> 'cost peel tin food put shin best'.gsub(/\b\w*(\w)\1\w*\b/).to_a
+=> ["peel", "food"]
+>> 'eel flee all pat ilk seen'.gsub(/\b\w*(\w)\1\w*\b/).to_a
+=> ["eel", "flee", "all", "seen"]
+```
 
 
 
