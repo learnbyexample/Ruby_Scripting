@@ -18,6 +18,7 @@
 * [Character class](#character-class)
 * [Groupings and backreferences](#groupings-and-backreferences)
     * [Non-capturing groups](#non-capturing-groups)
+    * [Named capture groups](#named-capture-groups)
 
 <br>
 
@@ -394,6 +395,7 @@ f:o:o:_:1 3:b
 ```
 
 * if index is same, then precedence is left to right
+* a simple workaround to remember as a trick is to sort the alternations longest first
 * See also [regular-expressions: alternation](https://www.regular-expressions.info/alternation.html)
 
 ```ruby
@@ -446,6 +448,12 @@ f:o:o:_:1 3:b
 => ["cat", "dog", "fox"]
 >> 'cat dog bee parrot fox'.gsub(Regexp.union(words), 'mammal')
 => "mammal mammal bee parrot mammal"
+
+# sort the list as longest string first where needed
+>> words = %w[hand handy handful hands handed]
+=> ["hand", "handy", "handful", "hands", "handed"]
+>> Regexp.union(words.sort_by { |w| -w.length })
+=> /handful|handed|handy|hands|hand/
 ```
 
 <br>
@@ -1131,6 +1139,17 @@ ba\bab
 => [["a", "b"], ["c", ""], ["42", "64"]]
 ```
 
+* `\1`, `\2` etc backreferences the matched string
+* use `\g<1>`, `\g<2>` etc to backreference the regular expression itself
+
+```ruby
+>> s = 'cat,2008-03-24,foo,2012-08-12,5632'
+=> "cat,2008-03-24,foo,2012-08-12,5632"
+
+>> s.match(/(\d{4}-\d{2}-\d{2}).*\g<1>/)[0]
+=> "2008-03-24,foo,2012-08-12"
+```
+
 <br>
 
 #### <a name="non-capturing-groups"></a>Non-capturing groups
@@ -1176,6 +1195,46 @@ ba\bab
 >> 'eel flee all pat ilk seen'.gsub(/\b\w*(\w)\1\w*\b/).to_a
 => ["eel", "flee", "all", "seen"]
 ```
+
+<br>
+
+#### <a name="named-capture-groups"></a>Named capture groups
+
+* capture groups can be given a name using `(?<name>)` or `(?'name')` and backreferenced using `\k<name>`
+* both named capture groups and normal capture groups cannot be used at the same time
+
+```ruby
+# giving names to first and second captured words instead of default numbers
+>> 'a,b 42,64'.gsub(/(?<fw>\w+),(?<sw>\w+)/, '\k<sw>,\k<fw>')
+=> "b,a 64,42"
+# alternate syntax
+>> 'a,b 42,64'.gsub(/(?'fw'\w+),(?'sw'\w+)/, '\k<sw>,\k<fw>')
+=> "b,a 64,42"
+
+# named capture group can be used for backreferencing with \g as well
+>> s.match(/(?<date>\d{4}-\d{2}-\d{2}).*\g<date>/)[0]
+=> "2008-03-24,foo,2012-08-12"
+```
+
+* by using `regexp =~ string` instead of `string =~ regexp`, the named capture groups can be used as variables inplace of `$1`, `$2`, etc
+
+```ruby
+>> s = '2018-10-25,car'
+=> "2018-10-25,car"
+
+>> /(?<date>[^,]+),(?<product>[^,]+)/ =~ s
+=> 0
+
+# same as: $1
+>> date
+=> "2018-10-25"
+# same as: $2
+>> product
+=> "car"
+```
+
+
+
 
 
 
