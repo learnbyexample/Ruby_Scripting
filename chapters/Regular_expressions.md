@@ -23,6 +23,7 @@
     * [Negative lookarounds](#negative-lookarounds)
     * [Positive lookarounds](#positive-lookarounds)
     * [Variable length lookbehind](#variable-length-lookbehind)
+* [Modifiers](#modifiers)
 
 <br>
 
@@ -1292,8 +1293,25 @@ ba\bab
 => "1,X,X,X,5"
 
 # replace empty fields with NA
+# same as: gsub(/(?<![^,])(?![^,])/, 'NA')
 >> ',,1,,,2,,3,,'.gsub(/(?<=\A|,)(?=,|\z)/, 'NA')
 => "NA,NA,1,NA,NA,2,NA,3,NA,NA"
+```
+
+* even though lookarounds are not part of matched string, capture groups can be used inside them
+
+```ruby
+>> puts 'a b c d e'.gsub(/(\S+\s+)(?=(\S+)\s)/, "\\1\\2\n")
+a b
+b c
+c d
+d e
+
+# use non-capturing group if needed
+>> 'pore42 car3 pare7 care5'.scan(/(?<=(po|ca)re)\d+/)
+=> [["po"], ["ca"]]
+>> 'pore42 car3 pare7 care5'.scan(/(?<=(?:po|ca)re)\d+/)
+=> ["42", "5"]
 ```
 
 <br>
@@ -1319,14 +1337,43 @@ SyntaxError ((irb):2: invalid pattern in look-behind: /(?<=(and.*?){2})and/)
 SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
 # match '123' in a string only if 'baz' doesn't occur before
 # every character from start of string has to be consumed one by one
->> 'foo and baz 123'.match?(/\A(.(?!baz))*123/)
+>> 'baz 123'.match?(/\A((?!baz).)*123/)
 => false
->> '123 foo'.match?(/\A(.(?!baz))*123/)
+>> '123 foo'.match?(/\A((?!baz).)*123/)
 => true
->> 'foo and 123 baz'.match?(/\A(.(?!baz))*123/)
+>> 'foo and 123 baz'.match?(/\A((?!baz).)*123/)
 => true
 ```
 
+<br>
+
+## <a name="modifiers"></a>Modifiers
+
+* use `i` modifier to ignore case while matching
+
+```ruby
+>> 'Cat' =~ /cat/
+=> nil
+>> 'Cat' =~ /cat/i
+=> 0
+
+>> 'Cat scat CATER cAts'.gsub(/cat/i, 'X')
+=> "X sX XER Xs"
+
+# same as: scan(/[a-zA-Z]+/)
+>> 'Sample123string54with908numbers'.scan(/[a-z]+/i)
+=> ["Sample", "string", "with", "numbers"]
+```
+
+* use `m` modifier to allow `.` metacharacter to match newline character as well
+
+```ruby
+>> "tar foo 123\n42 baz car".sub(/foo.*baz/, 'X')
+=> "tar foo 123\n42 baz car"
+
+>> "tar foo 123\n42 baz car".sub(/foo.*baz/m, 'X')
+=> "tar X car"
+```
 
 
 
