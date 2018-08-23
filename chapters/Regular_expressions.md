@@ -19,6 +19,10 @@
 * [Groupings and backreferences](#groupings-and-backreferences)
     * [Non-capturing groups](#non-capturing-groups)
     * [Named capture groups](#named-capture-groups)
+* [Lookarounds](#lookarounds)
+    * [Negative lookarounds](#negative-lookarounds)
+    * [Positive lookarounds](#positive-lookarounds)
+    * [Variable length lookbehind](#variable-length-lookbehind)
 
 <br>
 
@@ -1216,7 +1220,7 @@ ba\bab
 => "2008-03-24,foo,2012-08-12"
 ```
 
-* by using `regexp =~ string` instead of `string =~ regexp`, the named capture groups can be used as variables inplace of `$1`, `$2`, etc
+* by using `regexp =~ string` instead of `string =~ regexp`, the named capture groups can be used as variable assignment inplace of `$1`, `$2`, etc
 
 ```ruby
 >> s = '2018-10-25,car'
@@ -1231,6 +1235,96 @@ ba\bab
 # same as: $2
 >> product
 => "car"
+```
+
+<br>
+
+## <a name="lookarounds"></a>Lookarounds
+
+* these provide a way to add assertions before and/or after the pattern of interest
+* string matched by lookarounds won't be part of overall matched string, they specify a location similar to anchors
+    * hence, these are also known as **zero-width patterns**
+
+<br>
+
+#### <a name="negative-lookarounds"></a>Negative lookarounds
+
+* syntax is `(?<!)` for negative lookbehind and `(?!)` for negative lookahead
+* these are also useful to specify custom boundaries
+
+```ruby
+# change 'foo' only if it is not preceded by _
+# note how 'foo' at start of line is matched as well
+>> 'foo _foo 1foo'.gsub(/(?<!_)foo/, 'baz')
+=> "baz _foo 1baz"
+
+# change word only if it is not preceded by : or --
+>> ':cat --boat ;nice'.gsub(/(?<!:|--)\b\w+/, 'X')
+=> ":cat --boat ;X"
+
+# change 'foo' only if it is not followed by a digit character
+>> 'foo _food 1foo32 foot5'.gsub(/foo(?!\d)/, 'baz')
+=> "baz _bazd 1foo32 bazt5"
+
+# words not surrounded by punctuation marks
+>> ':cat top nice; cool. mad'.scan(/(?<![[:punct:]])\b\w+\b(?![[:punct:]])/)
+=> ["top", "mad"]
+```
+
+<br>
+
+#### <a name="positive-lookarounds"></a>Positive lookarounds
+
+* syntax is `(?<=)` for positive lookbehind and `(?=)` for positive lookahead
+
+```ruby
+# extract digits only if it is followed by ,
+>> '42 foo-5, baz3; x83, y-20; f12'.scan(/\d+(?=,)/)
+=> ["5", "83"]
+# extract digits only if it is preceded by - and followed by , or ;
+>> '42 foo-5, baz3; x83, y-20; f12'.scan(/(?<=-)\d+(?=[;,])/)
+=> ["5", "20"]
+
+# except first and last fields
+>> '1,2,3,4,5'.scan(/(?<=,)[^,]+(?=,)/)
+=> ["2", "3", "4"]
+>> '1,2,3,4,5'.gsub(/(?<=,)[^,]+(?=,)/, 'X')
+=> "1,X,X,X,5"
+
+# replace empty fields with NA
+>> ',,1,,,2,,3,,'.gsub(/(?<=\A|,)(?=,|\z)/, 'NA')
+=> "NA,NA,1,NA,NA,2,NA,3,NA,NA"
+```
+
+<br>
+
+#### <a name="variable-length-lookbehind"></a>Variable length lookbehind
+
+* string length of lookbehind assertion should be determinable statically
+* `\K` and lookahead helps as a workaround for some of the variable-length lookbehind cases
+    * Note that [\K is not documented](https://bugs.ruby-lang.org/issues/14500), so use only if you've tested it works for all cases
+* See also [stackoverflow - Variable-length lookbehind-assertion alternatives](https://stackoverflow.com/questions/11640447/variable-length-lookbehind-assertion-alternatives-for-regular-expressions)
+
+```ruby
+# same as: gsub(/(?<=-)\d+/, 'X')
+>> '42 foo-5, baz3; x83, y-20; f12'.gsub(/-\K\d+/, 'X')
+=> "42 foo-X, baz3; x83, y-X; f12"
+
+>> '1 land 2 sand 3 and 4 stand'.sub(/(?<=(and.*?){2})and/, 'X')
+SyntaxError ((irb):2: invalid pattern in look-behind: /(?<=(and.*?){2})and/)
+>> '1 land 2 sand 3 and 4 stand'.sub(/(and.*?){2}\Kand/, 'X')
+=> "1 land 2 sand 3 X 4 stand"
+
+>> 'foo and baz 123'.match?(/(?<!baz.*)123/)
+SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
+# match '123' in a string only if 'baz' doesn't occur before
+# every character from start of string has to be consumed one by one
+>> 'foo and baz 123'.match?(/\A(.(?!baz))*123/)
+=> false
+>> '123 foo'.match?(/\A(.(?!baz))*123/)
+=> true
+>> 'foo and 123 baz'.match?(/\A(.(?!baz))*123/)
+=> true
 ```
 
 
