@@ -1,4 +1,7 @@
-[![Join the chat at https://gitter.im/learnbyexample/scripting_course](https://badges.gitter.im/learnbyexample/scripting_course.svg)](https://gitter.im/learnbyexample/scripting_course) [![support learnbyexample](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/learnbyexample/donate)
+<p align="center">
+    <a href="https://gitter.im/learnbyexample/scripting_course"><img src="https://badges.gitter.im/learnbyexample/scripting_course.svg" width="100px" height="30px" /></a>
+    <a href="https://www.patreon.com/learnbyexample"><img src="./images/become_a_patron_button.png" width="150px" height="30px" /></a>
+</p>
 
 <br>
 
@@ -35,6 +38,7 @@
     * [Initialization](./chapters/Set.md#initialization), [Set operations](./chapters/Set.md#set-operations), [Miscellaneous](./chapters/Set.md#miscellaneous)
 * [String Methods](./chapters/String_methods.md)
     * [String formatting](./chapters/String_methods.md#string-formatting), [Looping](./chapters/String_methods.md#looping), [Condition checks](./chapters/String_methods.md#condition-checks), [Case conversion](./chapters/String_methods.md#case-conversion), [Search and Replace](./chapters/String_methods.md#search-and-replace), [Splitting](./chapters/String_methods.md#splitting), [Character manipulations](./chapters/String_methods.md#character-manipulations), [Miscellaneous](./chapters/String_methods.md#miscellaneous)
+* [Regular Expressions](./chapters/Regular_expressions.md)
 * [Exercises](./chapters/Exercises.md)
 
 <br>
@@ -45,7 +49,7 @@
     * Even for pull requests, open an issue for discussion before submitting PRs
     * or [gitter group chat](https://gitter.im/learnbyexample/scripting_course) for discussion
 * Share the repo with friends/colleagues, on social media, etc to help reach other learners
-* Contribute by donating on [liberapay](https://liberapay.com/learnbyexample/donate)
+* Contribute by donating on [patreon](https://www.patreon.com/learnbyexample)
 * In case you need to reach me, use [gitter private chat](https://gitter.im/learnbyexample)
     * or mail me at `echo 'yrneaolrknzcyr.arg@tznvy.pbz' | tr 'a-z' 'n-za-m'`
 
