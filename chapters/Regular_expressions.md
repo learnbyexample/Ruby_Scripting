@@ -117,6 +117,12 @@ hi
 >> sentence =~ /z/
 => nil
 
+>> puts 'hi' if sentence =~ /is/
+hi
+=> nil
+>> puts 'hi' if sentence =~ /z/
+=> nil
+
 # can also use: /z/ !~ sentence
 >> sentence !~ /z/
 => true
@@ -490,11 +496,14 @@ f:o:o:_:1 3:b
 ```
 
 * use `Regexp.escape` to let Ruby handle escaping all the metacharacters present in a string
+    * `Regexp.union` also escapes the metacharacters present in string arguments
 * to avoid escaping altogether, use string argument instead of regexp when regexp features are not needed
 
 ```ruby
 >> puts Regexp.escape('(a^b)')
 \(a\^b\)
+>> Regexp.union('foo', '(a^b)')
+=> /foo|\(a\^b\)/
 
 >> eqn = 'f*(a^b) - 3*(a^b)'
 => "f*(a^b) - 3*(a^b)"
@@ -1374,6 +1383,55 @@ SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
 >> "tar foo 123\n42 baz car".sub(/foo.*baz/m, 'X')
 => "tar X car"
 ```
+
+* use `o` modifier to perform interpolation only once
+    * helpful if you are using regexp inside a loop and the expression inside the interpolation always gives same value
+    * you could also save the regexp in a variable before the loop and use it instead of adding `o` modifier
+* See also [Ruby regular expressions: the o modifier](https://robm.me.uk/ruby/2014/03/30/regex-o-modifier.html)
+
+```ruby
+>> n = 2
+=> 2
+>> words = %w[car bike bus auto train plane]
+=> ["car", "bike", "bus", "auto", "train", "plane"]
+# as 'o' modifier is used, regexp will be evaluated only once
+>> words.select { |w| w.match?(/\A\w{#{2**n}}\z/o) }
+=> ["bike", "auto"]
+
+# expression result is not constant, so don't use 'o' modifier
+>> words.select.with_index(1) { |w, i| w.match?(/\A\w{#{2**i}}\z/) }
+=> ["bike"]
+```
+
+* `x` modifier allows to use literal whitespace and comments after the `#` character
+* this way, a complex regexp can be broken into multiple lines with comments
+* whitespace and `#` character needed as part of regexp should be escaped or use character class to represent them
+* See [ruby-doc: Free-Spacing Mode and Comments](https://ruby-doc.org/core-2.5.0/Regexp.html#class-Regexp-label-Free-Spacing+Mode+and+Comments) for details
+
+```ruby
+# same as: r = /^((?:[^,]+,){3})([^,]+)/
+>> r = /^(                  # group-1, captures first three columns
+           (?:[^,]+,){3}    # non-capturing group to get the three columns
+         )
+        ([^,]+)             # group-2, captures fourth column
+       /x
+
+>> '1,2,3,4,5,6,7'.sub(r, '\1(\2)')
+=> "1,2,3,(4),5,6,7"
+
+>> 'cat and dog'.match?(/t a/x)
+=> false
+>> 'cat and dog'.match?(/t\ a/x)
+=> true
+
+>> 'foo a#b 123'.match(/a#b/x)
+=> #<MatchData "a">
+>> 'foo a#b 123'.match(/a\#b/x)
+=> #<MatchData "a#b">
+```
+
+
+
 
 
 
