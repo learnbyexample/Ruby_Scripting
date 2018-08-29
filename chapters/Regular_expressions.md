@@ -27,7 +27,7 @@
 
 <br>
 
-Examples in this chapter will deal with ASCII characters only unless otherwise specified
+Examples in this chapter will deal with *ASCII* characters only unless otherwise specified
 
 <br>
 
@@ -1070,9 +1070,9 @@ ba\bab
 => ["", "a", "ate", "b", "c", "123", ""]
 ```
 
-* Ruby also provides named character sets, which are unicode aware unlike the escape sequences which only work on ASCII characters
+* Ruby also provides named character sets, which are unicode aware unlike the escape sequences which only work on *ASCII* characters
     * a named character set is defined by a name enclosed between `[:` and `:]` and has to be used within a character class `[]`, along with any other character as needed
-* only some examples for ASCII input given below, see [ruby-doc: Character Classes](https://ruby-doc.org/core-2.5.0/Regexp.html#class-Regexp-label-Character+Classes) for more details and other named character sets
+* only some examples for *ASCII* input given below, see [ruby-doc: Character Classes](https://ruby-doc.org/core-2.5.0/Regexp.html#class-Regexp-label-Character+Classes) for more details and other named character sets
 
 ```ruby
 # similar to: /\d+/ or /[0-9]+/
@@ -1382,6 +1382,10 @@ SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
 
 >> "tar foo 123\n42 baz car".sub(/foo.*baz/m, 'X')
 => "tar X car"
+
+# multiple modifiers can be used as needed
+>> "tar foo 123\n42 Baz car".sub(/foo.*baz/im, 'X')
+=> "tar X car"
 ```
 
 * use `o` modifier to perform interpolation only once
@@ -1403,7 +1407,7 @@ SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
 => ["bike"]
 ```
 
-* `x` modifier allows to use literal whitespace and comments after the `#` character
+* `x` modifier allows to use literal whitespaces for aligning purposes and comments after the `#` character
 * this way, a complex regexp can be broken into multiple lines with comments
 * whitespace and `#` character needed as part of regexp should be escaped or use character class to represent them
 * See [ruby-doc: Free-Spacing Mode and Comments](https://ruby-doc.org/core-2.5.0/Regexp.html#class-Regexp-label-Free-Spacing+Mode+and+Comments) for details
@@ -1423,12 +1427,63 @@ SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
 => false
 >> 'cat and dog'.match?(/t\ a/x)
 => true
+>> 'cat and dog'.match?(/t\x20a/x)
+=> true
 
 >> 'foo a#b 123'.match(/a#b/x)
 => #<MatchData "a">
 >> 'foo a#b 123'.match(/a\#b/x)
 => #<MatchData "a#b">
 ```
+
+* a comment can also be added using `(?#comment)` when `x` modifier is not used
+    * this is a non-capturing group
+
+```ruby
+>> r = /^((?:[^,]+,){3})(?#3-cols)([^,]+)(?#4th-col)/
+=> /^((?:[^,]+,){3})(?#3-cols)([^,]+)(?#4th-col)/
+
+>> '1,2,3,4,5,6,7'.sub(r, '\1(\2)')
+=> "1,2,3,(4),5,6,7"
+```
+
+* regexp encoding can be changed from source encoding using modifiers
+* for ex: `n` to specify regexp encoding as *ASCII-8BIT*
+* See [ruby-doc: Regexp Encoding](https://ruby-doc.org/core-2.5.0/Regexp.html#class-Regexp-label-Encoding) for other such modifiers and details
+* See also [ruby-doc: Encoding](https://ruby-doc.org/core-2.5.0/Encoding.html) for details on handling different string encodings
+
+```ruby
+>> s = 'foo - baz'
+>> s.gsub(/\w+/n, '(\0)')
+=> "(foo) - (baz)"
+
+>> s = 'foo — baz'
+>> s.gsub(/\w+/n, '(\0)')
+(irb):4: warning: historical binary regexp match /.../n against UTF-8 string
+=> "(foo) — (baz)"
+```
+
+* the modifiers can also be applied to specific portion of regexp instead of entire pattern, for ex:
+    * `(?i:foo)` will apply case-insensitive matching only for this regexp portion
+    * `(?-i:foo)` will avoid case-insensitive matching only for this regexp portion
+* this way, modifiers for a regexp portion can be defined irrespective of modifier applied for entire regexp
+* these are non-capturing groups
+
+```ruby
+# case-insensitive only for 'cat'
+>> 'Cat scatter CATER cAts'.scan(/(?i:cat)[a-z]*\b/)
+=> ["Cat", "catter", "cAts"]
+
+# case-sensitive only for 'Cat'
+>> 'Cat SCatTeR CATER cAts'.scan(/(?-i:Cat)[a-z]*\b/i)
+=> ["Cat", "CatTeR"]
+
+>> Regexp.union(/foo/i, 'bar')
+=> /(?i-mx:foo)|bar/
+>> Regexp.union(/foo/, 'a^b', /c.t\b/im)
+=> /(?-mix:foo)|a\^b|(?mi-x:c.t\b)/
+```
+
 
 
 
