@@ -24,6 +24,8 @@
     * [Positive lookarounds](#positive-lookarounds)
     * [Variable length lookbehind](#variable-length-lookbehind)
 * [Modifiers](#modifiers)
+* [Miscellaneous](#miscellaneous)
+* [Further Reading](#further-reading)
 
 <br>
 
@@ -78,7 +80,7 @@ Quoting from [ruby-doc: Regexp](https://ruby-doc.org/core-2.5.0/Regexp.html)
 ```
 
 * regexp literals can be saved in a variable
-* like double quoted string, it allows interpolation as well
+* like double quoted string, it allows interpolation and escape sequences like `\t`, `\n`, `\x27`, etc
 
 ```ruby
 >> r = /is/
@@ -1466,6 +1468,7 @@ SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
 * the modifiers can also be applied to specific portion of regexp instead of entire pattern, for ex:
     * `(?i:foo)` will apply case-insensitive matching only for this regexp portion
     * `(?-i:foo)` will avoid case-insensitive matching only for this regexp portion
+    * `(?i)` will apply case-insensitive matching to regexp portion from this point onwards
 * this way, modifiers for a regexp portion can be defined irrespective of modifier applied for entire regexp
 * these are non-capturing groups
 
@@ -1473,9 +1476,13 @@ SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
 # case-insensitive only for 'cat'
 >> 'Cat scatter CATER cAts'.scan(/(?i:cat)[a-z]*\b/)
 => ["Cat", "catter", "cAts"]
+>> 'Cat scatter CATER cAts'.scan(/cat(?-i)[a-z]*\b/i)
+=> ["Cat", "catter", "cAts"]
 
 # case-sensitive only for 'Cat'
 >> 'Cat SCatTeR CATER cAts'.scan(/(?-i:Cat)[a-z]*\b/i)
+=> ["Cat", "CatTeR"]
+>> 'Cat SCatTeR CATER cAts'.scan(/Cat(?i)[a-z]*\b/)
 => ["Cat", "CatTeR"]
 
 >> Regexp.union(/foo/i, 'bar')
@@ -1484,7 +1491,57 @@ SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
 => /(?-mix:foo)|a\^b|(?mi-x:c.t\b)/
 ```
 
+<br>
 
+## <a name="miscellaneous"></a>Miscellaneous
+
+* sometimes, it is simpler or necessary to use a hash variable to perform substitution using matched string as key
+
+```ruby
+# one to one mappings
+>> h = { '1' => 'one', '2' => 'two', '4' => 'four' }
+=> {"1"=>"one", "2"=>"two", "4"=>"four"}
+>> '9234012'.gsub(/[124]/) { h[$&] }
+=> "9two3four0onetwo"
+
+# swap words
+>> h = { 'cat' => 'tiger', 'tiger' => 'cat' }
+=> {"cat"=>"tiger", "tiger"=>"cat"}
+# without worrying what was defined in hash
+>> 'cat tiger dog tiger cat'.gsub(/\w+/) { h.key?($&) ? h[$&] : $& }
+=> "tiger cat dog cat tiger"
+# or build the regexp for simple cases
+>> 'cat tiger dog tiger cat'.gsub(/cat|tiger/) { h[$&] }
+=> "tiger cat dog cat tiger"
+```
+
+* if you are building an alternation list based on hash keys, sort it longest length first
+
+```ruby
+>> h = { 'hand' => 1, 'handy' => 2, 'handful' => 3 }
+=> {"hand"=>1, "handy"=>2, "handful"=>3}
+
+>> 'handful hand pin handy'.gsub(Regexp.union(h.keys)) { h[$&] }
+=> "1ful 1 pin 1y"
+
+>> r = Regexp.union(h.keys.sort_by { |w| -w.length })
+=> /handful|handy|hand/
+>> 'handful hand pin handy'.gsub(r) { h[$&] }
+=> "3 1 pin 2"
+```
+
+<br>
+
+## <a name="further-reading"></a>Further Reading
+
+Note that most of these resources are not specific to Ruby, so use them with caution and check if they apply to Ruby's syntax and features
+
+* [rubular](http://rubular.com/) - Ruby regular expression editor
+* [stackoverflow: regex FAQ](https://stackoverflow.com/questions/22937618/reference-what-does-this-regex-mean)
+* [rexegg](https://www.rexegg.com/) - comprehensive regular expression tutorials, tricks and more
+* [regexcrossword](https://regexcrossword.com/) - tutorials and puzzles
+* [swtch](https://swtch.com/~rsc/regexp/regexp1.html) - stuff about regular expression implementation engines
+* [regexper](https://regexper.com/) - for visualization
 
 
 
