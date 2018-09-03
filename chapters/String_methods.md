@@ -446,7 +446,6 @@ Regular expression based processing is be covered separately in [next chapter](.
 
 * replace first/all matching string with another
     * `block` form is also supported
-* use `!` versions for in-place modification
 
 ```ruby
 # replace only first match
@@ -469,6 +468,25 @@ Regular expression based processing is be covered separately in [next chapter](.
 >>   "#{s.capitalize} #{a}"
 >> end
 => "Hi 16 there"
+```
+
+* use `!` versions for in-place modification
+    * returns `nil` if no changes were made, useful for decision making
+
+```ruby
+>> s = 'cat fat bat cater'
+=> "cat fat bat cater"
+>> s.gsub!('cat', 'tiger')
+=> "tiger fat bat tigerer"
+>> s
+=> "tiger fat bat tigerer"
+
+>> s = 'coffining'
+=> "coffining"
+>> nil while s.sub!('fin', '')
+=> nil
+>> s
+=> "cog"
 ```
 
 <br>
