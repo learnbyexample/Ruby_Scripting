@@ -1503,6 +1503,10 @@ SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
 => {"1"=>"one", "2"=>"two", "4"=>"four"}
 >> '9234012'.gsub(/[124]/) { h[$&] }
 => "9two3four0onetwo"
+# or, simply pass hash variable as replacement argument
+# if the matched text doesn't exist as a key, default value will be used
+>> '9234012'.gsub(/[124]/, h)
+=> "9two3four0onetwo"
 
 # swap words
 >> h = { 'cat' => 'tiger', 'tiger' => 'cat' }
@@ -1511,7 +1515,7 @@ SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
 >> 'cat tiger dog tiger cat'.gsub(/\w+/) { h.key?($&) ? h[$&] : $& }
 => "tiger cat dog cat tiger"
 # or build the regexp for simple cases
->> 'cat tiger dog tiger cat'.gsub(/cat|tiger/) { h[$&] }
+>> 'cat tiger dog tiger cat'.gsub(/cat|tiger/, h)
 => "tiger cat dog cat tiger"
 ```
 
@@ -1521,13 +1525,30 @@ SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
 >> h = { 'hand' => 1, 'handy' => 2, 'handful' => 3 }
 => {"hand"=>1, "handy"=>2, "handful"=>3}
 
->> 'handful hand pin handy'.gsub(Regexp.union(h.keys)) { h[$&] }
+>> 'handful hand pin handy'.gsub(Regexp.union(h.keys), h)
 => "1ful 1 pin 1y"
 
 >> r = Regexp.union(h.keys.sort_by { |w| -w.length })
 => /handful|handy|hand/
->> 'handful hand pin handy'.gsub(r) { h[$&] }
+>> 'handful hand pin handy'.gsub(r, h)
 => "3 1 pin 2"
+```
+
+* left to right precedence of alternation can be exploited usefully in some cases
+* for example, to extract quoted fields with `,` from simpler csv strings
+    * use proper csv parser if nature of input is not known
+* See also [rexegg: best regex trick](https://www.rexegg.com/regex-best-trick.html)
+
+```ruby
+>> 'foo,"10,000",baz'.split(',')
+=> ["foo", "\"10", "000\"", "baz"]
+# specify regexp for quoted fields first
+>> 'foo,"10,000",baz'.scan(/"[^"]+"|[^,]+/)
+=> ["foo", "\"10,000\"", "baz"]
+
+# such cases are a good place to use possessive quantifiers as well
+>> "42 'good bye' 123".scan(/'[^']++'|[^ ]+/)
+=> ["42", "'good bye'", "123"]
 ```
 
 <br>
@@ -1537,11 +1558,12 @@ SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
 Note that most of these resources are not specific to Ruby, so use them with caution and check if they apply to Ruby's syntax and features
 
 * [rubular](http://rubular.com/) - Ruby regular expression editor
+* [stackoverflow: ruby regexp](https://stackoverflow.com/questions/tagged/ruby+regex?sort=votes&pageSize=15)
 * [stackoverflow: regex FAQ](https://stackoverflow.com/questions/22937618/reference-what-does-this-regex-mean)
 * [rexegg](https://www.rexegg.com/) - comprehensive regular expression tutorials, tricks and more
 * [regexcrossword](https://regexcrossword.com/) - tutorials and puzzles
-* [swtch](https://swtch.com/~rsc/regexp/regexp1.html) - stuff about regular expression implementation engines
 * [regexper](https://regexper.com/) - for visualization
+* [swtch](https://swtch.com/~rsc/regexp/regexp1.html) - stuff about regular expression implementation engines
 
 
 
