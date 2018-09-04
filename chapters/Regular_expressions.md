@@ -25,6 +25,9 @@
     * [Variable length lookbehind](#variable-length-lookbehind)
 * [Modifiers](#modifiers)
 * [Miscellaneous](#miscellaneous)
+    * [Using hashes](#using-hashes)
+    * [\G anchor](#g-anchor)
+    * [Recursive matching](#recursive-matching)
 * [Further Reading](#further-reading)
 
 <br>
@@ -1495,6 +1498,8 @@ SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
 
 ## <a name="miscellaneous"></a>Miscellaneous
 
+#### <a name="using-hashes"></a>Using hashes
+
 * sometimes, it is simpler or necessary to use a hash variable to perform substitution using matched string as key
 
 ```ruby
@@ -1550,6 +1555,79 @@ SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
 >> "42 'good bye' 123".scan(/'[^']++'|[^ ]+/)
 => ["42", "'good bye'", "123"]
 ```
+
+<br>
+
+#### <a name="g-anchor"></a>\G anchor
+
+* `\G` anchors matching from start of line like `\A`
+* in addition, after a substitution is done, that location is considered as the new anchor
+* this process is repeated again and continues until the given regexp fails to match
+
+```ruby
+# all non-whitespace characters from start of string
+>> '123-87-593 42 foo'.gsub(/\G\S/, '*')
+=> "********** 42 foo"
+
+# all digits and optional - combo from start of string
+>> '123-87-593 42 foo'.gsub(/\G(\d+)(-?)/, '(\1)\2')
+=> "(123)-(87)-(593) 42 foo"
+
+# all word characters from start of string
+# only if it is followed by word character
+>> 'cat12 bat pin'.gsub(/\G\w(?=\w)/, '\0:')
+=> "c:a:t:1:2 bat pin"
+
+# all lowercase alphabets or space from start of string
+>> 'par tar-den hen-food mood'.gsub(/\G[a-z ]/, '(\0)')
+=> "(p)(a)(r)( )(t)(a)(r)-den hen-food mood"
+```
+
+<br>
+
+#### <a name="recursive-matching"></a>Recursive matching
+
+* the `\g` backreferencing helps to match recursively, for ex: matching text from start to end of nested parentheses
+* since this is a complicated example, let's build it step by step
+
+```ruby
+# matching one-level parentheses
+# note the use of possessive quantifier
+>> 'a + (b * c) - (d / e)'.scan(/\([^()]++\)/)
+=> ["(b * c)", "(d / e)"]
+>> '(a + (b * c) / 2) * (d / e)'.scan(/\([^()]++\)/)
+=> ["(b * c)", "(d / e)"]
+
+# matching up to two-level parentheses
+# note the use of non-capturing group
+>> '(a + (b * c) / 2) * (d / e)'.scan(/\((?:[^()]++|\([^()]++\))++\)/)
+=> ["(a + (b * c) / 2)", "(d / e)"]
+>> '3 * ((r-2)*(t+2)/6)'.scan(/\((?:[^()]++|\([^()]++\))++\)/)
+=> ["((r-2)*(t+2)/6)"]
+```
+
+The two-level matching regexp is built by specifying the one-level regexp as part of an alternation. See the below image for illustration (courtesy [regexper](https://regexper.com/))
+
+![two-level parentheses matching regexp](../images/two_level.png)
+
+* by using capture group and `\g` as part of alternation inside the same capture group that is referenced by `\g`, we get recursive matching
+
+```ruby
+>> '3 * ((r-2)*(t+2)/6)'.gsub(/\(((?:[^()]++|\(\g<1>\))++)\)/).to_a
+=> ["((r-2)*(t+2)/6)"]
+
+>> '(3+a) * ((r-2)*(t+2)/6)'.gsub(/\(((?:[^()]++|\(\g<1>\))++)\)/).to_a
+=> ["(3+a)", "((r-2)*(t+2)/6)"]
+
+>> s = '(3+a) * ((r-2)*(t+2)/6) + 42 * (a(b(c(d(e)))))'
+=> "(3+a) * ((r-2)*(t+2)/6) + 42 * (a(b(c(d(e)))))"
+>> s.gsub(/\(((?:[^()]++|\(\g<1>\))++)\)/).to_a
+=> ["(3+a)", "((r-2)*(t+2)/6)", "(a(b(c(d(e)))))"]
+```
+
+See the below image for illustration (courtesy [regexper](https://regexper.com/))
+
+![nested parentheses matching regexp](../images/generic_nested.png)
 
 <br>
 
