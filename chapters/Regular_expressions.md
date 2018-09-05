@@ -32,7 +32,8 @@
 
 <br>
 
-Examples in this chapter will deal with *ASCII* characters only unless otherwise specified
+* Examples in this chapter will deal with *ASCII* characters only unless otherwise specified
+* Some features are not documented on [ruby-doc: Regexp](https://ruby-doc.org/core-2.5.0/Regexp.html), see [Onigmo regular expressions library](https://github.com/k-takata/Onigmo/blob/master/doc/RE) for such cases
 
 <br>
 
@@ -1077,6 +1078,7 @@ ba\bab
 
 * Ruby also provides named character sets, which are unicode aware unlike the escape sequences which only work on *ASCII* characters
     * a named character set is defined by a name enclosed between `[:` and `:]` and has to be used within a character class `[]`, along with any other character as needed
+    * `[:^` instead of `[:` will negate the character set
 * only some examples for *ASCII* input given below, see [ruby-doc: Character Classes](https://ruby-doc.org/core-2.5.0/Regexp.html#class-Regexp-label-Character+Classes) for more details and other named character sets
 
 ```ruby
@@ -1084,6 +1086,7 @@ ba\bab
 >> 'foo=5, bar=3; x=83, y=120'.scan(/[[:digit:]]+/)
 => ["5", "3", "83", "120"]
 # similar to: /\D+/ or /[^0-9]+/
+# can also use: /[[:^digit:]]+/
 >> 'like 42 and 37.'.gsub(/[^[:digit:]]+/, 'X')
 => "X42X37X"
 
@@ -1561,15 +1564,19 @@ SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
 #### <a name="g-anchor"></a>\G anchor
 
 * `\G` anchors matching from start of line like `\A`
-* in addition, after a substitution is done, that location is considered as the new anchor
+* in addition, after a match is done, ending of that location is considered as the new anchor
 * this process is repeated again and continues until the given regexp fails to match
 
 ```ruby
 # all non-whitespace characters from start of string
+>> '123-87-593 42 foo'.scan(/\G\S/)
+=> ["1", "2", "3", "-", "8", "7", "-", "5", "9", "3"]
 >> '123-87-593 42 foo'.gsub(/\G\S/, '*')
 => "********** 42 foo"
 
 # all digits and optional - combo from start of string
+>> '123-87-593 42 foo'.scan(/\G\d+-?/)
+=> ["123-", "87-", "593"]
 >> '123-87-593 42 foo'.gsub(/\G(\d+)(-?)/, '(\1)\2')
 => "(123)-(87)-(593) 42 foo"
 
