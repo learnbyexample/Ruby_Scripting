@@ -28,6 +28,7 @@
     * [Using hashes](#using-hashes)
     * [\G anchor](#g-anchor)
     * [Recursive matching](#recursive-matching)
+    * [Substitution in conditional expression](#substitution-in-conditional-expression)
 * [Further Reading](#further-reading)
 
 <br>
@@ -1635,6 +1636,35 @@ The two-level matching regexp is built by specifying the one-level regexp as par
 See the below image for illustration (courtesy [regexper](https://regexper.com/))
 
 ![nested parentheses matching regexp](../images/generic_nested.png)
+
+<br>
+
+#### <a name="substitution-in-conditional-expression"></a>Substitution in conditional expression
+
+* recall that `sub!` and `gsub!` methods return `nil` if substitution fails
+* this makes them usable as part of a conditional expression
+
+```ruby
+>> s = '4'
+=> "4"
+>> puts "#{s} apples" if s.sub!(/\d+/) { $&.to_i ** 2 }
+16 apples
+
+>> s, c = ['coffining', 0]
+=> ["coffining", 0]
+>> c += 1 while s.sub!(/.in/, '')
+=> nil
+>> [s, c]
+=> ["cog", 2]
+
+>> s = '421,foo,2425,42,5,foo,6,6,42'
+=> "421,foo,2425,42,5,foo,6,6,42"
+# similar to: s.split(',').uniq.join(',')
+>> nil while s.gsub!(/(?<=\A|,)([^,]++).*\K,\1(?=,|\z)/, '')
+=> nil
+>> s
+=> "421,foo,2425,42,5,6"
+```
 
 <br>
 
