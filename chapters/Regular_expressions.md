@@ -154,7 +154,7 @@ hi
     * line is distinguished from another by a newline character
 * the `^` metacharacter anchors the regexp pattern to start of line
 * the `$` metacharacter anchors the regexp pattern to end of line
-* in later sections we'll see how to specify `^` and `$` literally
+* in later sections we'll see how to match `^` and `$` characters literally
 
 ```ruby
 >> s = 'cat and dog'
@@ -227,6 +227,7 @@ hi
 1: concatenate
 1: cat
 
+# if replacement/block is not given, gsub returns an Enumerator
 >> puts s.gsub(/^/).with_index(1) { |m, i| "#{i}: " }
 1: catapults
 2: concatenate
@@ -238,7 +239,7 @@ concatenate.
 cat.
 ```
 
-* if there is a newline character at end of string, there is an additional end of line match
+* if there is a newline character at end of string, there is an additional end of line match but no additional start of line match
 
 ```ruby
 >> puts "a\nb\n".gsub(/^/, 'foo ')
@@ -816,7 +817,7 @@ ABC
 ABBBC
 ```
 
-* global variables also hold information related to matched data
+* global variables hold information related to matched data
     * as noted before, `match?` method won't affect these variables
 * `$~` contains `MatchData`
 * <code>$`</code> contains string before the matched string
@@ -922,7 +923,7 @@ ABBBC
 
 * `.` meta character provides a way to match any character
 * character class provides a way to match any character among a specified set of characters enclosed within `[]`
-* quantifiers applies to characters class as well
+* quantifiers can be applied to characters class as well
 
 ```ruby
 # same as: /c(o|u)t/
@@ -1118,8 +1119,8 @@ ba\bab
 
 ```ruby
 # remove quotes surrounding digits
->> '"52" apples and "31" mangoes'.gsub(/"(\d+)"/, '\1')
-=> "52 apples and 31 mangoes"
+>> puts '"52" apples and "31" mangoes'.gsub(/"(\d+)"/, '\1')
+52 apples and 31 mangoes
 # replace __ with _ and delete _ if it is alone
 >> '_foo_ __123__ _baz_'.gsub(/(_)?_/, '\1')
 => "foo _123_ baz"
@@ -1407,7 +1408,7 @@ SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
 => 2
 >> words = %w[car bike bus auto train plane]
 => ["car", "bike", "bus", "auto", "train", "plane"]
-# as 'o' modifier is used, regexp will be evaluated only once
+# as 'o' modifier is used, expression inside #{} will be evaluated only once
 >> words.select { |w| w.match?(/\A\w{#{2**n}}\z/o) }
 => ["bike", "auto"]
 
