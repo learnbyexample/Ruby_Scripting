@@ -24,6 +24,7 @@
     * [Positive lookarounds](#positive-lookarounds)
     * [Variable length lookbehind](#variable-length-lookbehind)
 * [Modifiers](#modifiers)
+* [Unicode](#unicode)
 * [Miscellaneous](#miscellaneous)
     * [Using hashes](#using-hashes)
     * [\G anchor](#g-anchor)
@@ -134,6 +135,19 @@ hi
 >> sentence !~ /z/
 => true
 >> sentence !~ /is/
+=> false
+```
+
+* the `===` operator returns `true` or `false` similar to `match?` method, but this will set global variables
+* this is more useful when using `grep/grep_v` Enumerable method to filter elements based on regexp
+
+```ruby
+>> sentence = 'This is a sample string'
+=> "This is a sample string"
+
+>> /is/ === sentence
+=> true
+>> /z/ === sentence
 => false
 ```
 
@@ -1004,8 +1018,8 @@ ABBBC
 # filtering words without vowels
 >> words = %w[tryst glyph pity why]
 => ["tryst", "glyph", "pity", "why"]
-# can also use: { |w| w =~ /\b[^aeiou]+\b/ } or { |w| w !~ /[aeiou]/ }
->> words.select { |w| w.match?(/\b[^aeiou]+\b/) }
+# can also use: words.grep_v(/[aeiou]/)
+>> words.grep(/\A[^aeiou]+\z/)
 => ["tryst", "glyph", "why"]
 ```
 
@@ -1241,6 +1255,7 @@ ba\bab
 ```
 
 * by using `regexp =~ string` instead of `string =~ regexp`, the named capture groups can be used as variable assignment inplace of `$1`, `$2`, etc
+* See also [stackoverflow: named captures as a hash](https://stackoverflow.com/questions/18825669/how-to-do-named-capture-in-ruby)
 
 ```ruby
 >> s = '2018-10-25,car'
@@ -1409,7 +1424,7 @@ SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
 >> words = %w[car bike bus auto train plane]
 => ["car", "bike", "bus", "auto", "train", "plane"]
 # as 'o' modifier is used, expression inside #{} will be evaluated only once
->> words.select { |w| w.match?(/\A\w{#{2**n}}\z/o) }
+>> words.grep(/\A\w{#{2**n}}\z/o)
 => ["bike", "auto"]
 
 # expression result is not constant, so don't use 'o' modifier
@@ -1498,6 +1513,45 @@ SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
 >> Regexp.union(/foo/, 'a^b', /c.t\b/im)
 => /(?-mix:foo)|a\^b|(?mi-x:c.t\b)/
 ```
+
+<br>
+
+## <a name="unicode"></a>Unicode
+
+* similar to named character classes, the `\p{}` construct comes in handy when dealing with Unicode characters
+
+```ruby
+# extract all consecutive letters
+>> 'fox:αλεπού,eagle:αετός'.scan(/\p{L}+/)
+=> ["fox", "αλεπού", "eagle", "αετός"]
+# extract all consecutive Greek letters
+>> 'fox:αλεπού,eagle:αετός'.scan(/\p{Greek}+/)
+=> ["αλεπού", "αετός"]
+
+# extract all words
+>> 'φοο12,βτ_4,foo'.scan(/\p{Word}+/)
+=> ["φοο12", "βτ_4", "foo"]
+
+# delete all characters other than letters
+# \p{^L} can also be used instead of \P{L}
+>> 'φοο12,βτ_4,foo'.gsub(/\P{L}+/, '')
+=> "φοοβτfoo"
+```
+
+* for character class ranges, use codepoints defined by `\u{}`
+
+```ruby
+>> 'hi 😆😇'.codepoints.map { |i| '%x' % i }
+=> ["68", "69", "20", "1f606", "1f607"]
+
+>> puts "\u{68}\u{69}\u{20}\u{1f606}\u{1f607}"
+hi 😆😇
+```
+
+**Further Reading**
+
+* [ruby-doc: Character Properties](https://ruby-doc.org/core-2.5.0/Regexp.html#class-Regexp-label-Character+Properties)
+* [regular-expressions: unicode](https://www.regular-expressions.info/unicode.html)
 
 <br>
 
