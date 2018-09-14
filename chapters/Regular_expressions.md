@@ -1790,6 +1790,24 @@ See the below image for illustration (courtesy [regexper](https://regexper.com/)
 => ["1,2,3,", "4,5,6,"]
 ```
 
+* using `\g` replaces the value backreferenced by the capturing group with the new value that is matched with `\g`
+
+```ruby
+>> d = '2008-03-24,2012-08-12 2017-06-27,2018-03-25 1999-12-23,2001-05-08'
+=> "2008-03-24,2012-08-12 2017-06-27,2018-03-25 1999-12-23,2001-05-08"
+
+# output has the value matched by \g<1> and not the capture group
+>> d.scan(/(\d{4}-\d{2}-\d{2}),\g<1>/)
+=> [["2012-08-12"], ["2018-03-25"], ["2001-05-08"]]
+
+# this will retain the second date of each pair
+>> d.gsub(/(\d{4}-\d{2}-\d{2}),\g<1>/, '\1')
+=> "2012-08-12 2018-03-25 2001-05-08"
+# this will retain the first date of each pair
+>> d.gsub(/((\d{4}-\d{2}-\d{2})),\g<2>/, '\1')
+=> "2008-03-24 2017-06-27 1999-12-23"
+```
+
 <br>
 
 ## <a name="further-reading"></a>Further Reading
