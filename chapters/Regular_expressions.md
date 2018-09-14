@@ -30,6 +30,7 @@
     * [\G anchor](#g-anchor)
     * [Recursive matching](#recursive-matching)
     * [Substitution in conditional expression](#substitution-in-conditional-expression)
+* [Gotchas](#gotchas)
 * [Further Reading](#further-reading)
 
 <br>
@@ -1379,6 +1380,25 @@ SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
 => true
 ```
 
+* the absence operator `(?~)` provides a simpler syntax for some cases
+* See [Onigmo regular expressions library](https://github.com/k-takata/Onigmo/blob/master/doc/RE) for details
+
+```ruby
+# match 'foo' followed by 'baz' only if '123' is not in between
+# using negative lookahead
+>> 'foo and 123 baz'.match?(/foo((?!123).)*baz/)
+=> false
+>> 'foo and 12 baz'.match?(/foo((?!123).)*baz/)
+=> true
+
+# using absence operator
+# note that there is no quantifier
+>> 'foo and 123 baz'.match?(/foo(?~123)baz/)
+=> false
+>> 'foo and 12 baz'.match?(/foo(?~123)baz/)
+=> true
+```
+
 <br>
 
 ## <a name="modifiers"></a>Modifiers
@@ -1622,6 +1642,7 @@ hi 😆😇
 * `\G` anchors matching from start of line like `\A`
 * in addition, after a match is done, ending of that location is considered as the new anchor
 * this process is repeated again and continues until the given regexp fails to match
+* See also [regular-expressions: Continuing at The End of The Previous Match](https://www.regular-expressions.info/continue.html), especially the second section that discusses about implementation detail
 
 ```ruby
 # all non-whitespace characters from start of string
@@ -1723,6 +1744,54 @@ See the below image for illustration (courtesy [regexper](https://regexper.com/)
 
 <br>
 
+## <a name="gotchas"></a>Gotchas
+
+* how much does `*` match?
+* See also [regular-expressions: Zero-Length Matches](https://www.regular-expressions.info/zerolength.html)
+
+```ruby
+# there is an extra empty string match at end of non-empty columns
+# even though * is greedy quantifier
+>> ',baz,,xyz,'.gsub(/[^,]*/, '[\0]')
+=> "[],[baz][],[],[xyz][],[]"
+
+# use positive lookbehind as a workaround
+>> ',baz,,xyz,'.gsub(/(?<=\A|,)[^,]*/, '[\0]')
+=> "[],[baz],[],[xyz],[]"
+```
+
+* don't use `\K` if there are consecutive matches
+
+```ruby
+>> ',baz,,,xyz,'.gsub(/(?<=\A|,)[^,]*/, '[\0]')
+=> "[],[baz],[],[],[xyz],[]"
+>> ',baz,,,xyz,'.gsub(/(?:\A|,)\K[^,]*/, '[\0]')
+=> "[],baz,[],,[xyz],[]"
+
+>> 'abcd foobaz'.gsub(/(?<=\w)/, ':')
+=> "a:b:c:d: f:o:o:b:a:z:"
+>> 'abcd foobaz'.gsub(/\w/, '\0:')
+=> "a:b:c:d: f:o:o:b:a:z:"
+>> 'abcd foobaz'.gsub(/\w\K/, ':')
+=> "a:bc:d f:oo:ba:z"
+```
+
+* quantifier applied on a capture group will give you only the last match
+
+```ruby
+>> '1,2,3,4,5,6,7'.sub(/^([^,]+,){3}([^,]+)/, '\1(\2)')
+=> "3,(4),5,6,7"
+>> '1,2,3,4,5,6,7'.sub(/^((?:[^,]+,){3})([^,]+)/, '\1(\2)')
+=> "1,2,3,(4),5,6,7"
+
+>> '1,2,3,4,5,6,7'.scan(/([^,]+,){3}/)
+=> [["3,"], ["6,"]]
+>> '1,2,3,4,5,6,7'.scan(/(?:[^,]+,){3}/)
+=> ["1,2,3,", "4,5,6,"]
+```
+
+<br>
+
 ## <a name="further-reading"></a>Further Reading
 
 Note that most of these resources are not specific to Ruby, so use them with caution and check if they apply to Ruby's syntax and features
@@ -1734,10 +1803,4 @@ Note that most of these resources are not specific to Ruby, so use them with cau
 * [regexcrossword](https://regexcrossword.com/) - tutorials and puzzles
 * [regexper](https://regexper.com/) - for visualization
 * [swtch](https://swtch.com/~rsc/regexp/regexp1.html) - stuff about regular expression implementation engines
-
-
-
-
-
-
 
