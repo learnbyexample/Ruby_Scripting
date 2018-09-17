@@ -88,6 +88,8 @@ IndexError (index 2 outside of array bounds: -2...2)
 
 * `%w` percent string is useful to create an array of strings
 * space is used to separate the strings, which can be escaped if needed
+* if an array is passed as argument to `puts`, each element is printed on its own line
+    * this is applied recursively for nested arrays
 
 ```ruby
 >> fruits = %w[apple mango orange]
@@ -96,8 +98,13 @@ IndexError (index 2 outside of array bounds: -2...2)
 >> books = %w{Harry\ Potter Stormlight\ Archive Kingkiller\ Chronicle}
 => ["Harry Potter", "Stormlight Archive", "Kingkiller Chronicle"]
 
+# Note that quote is just another character, no interpolation
 >> items = %w("foo\nbaz" "123\n42\n65")
 => ["\"foo\\nbaz\"", "\"123\\n42\\n65\""]
+>> puts items
+"foo\nbaz"
+"123\n42\n65"
+=> nil
 ```
 
 * arrays can also be created using `new` method of Array class
@@ -159,8 +166,11 @@ IndexError (index 2 outside of array bounds: -2...2)
 
 * [ruby-doc: Array](https://ruby-doc.org/core-2.5.0/Array.html)
 * [ruby-doc: Enumerable](https://ruby-doc.org/core-2.5.0/Enumerable.html)
-    * Array is enumerable, so all Enumerable methods are applicable to Array objects as well
+    * Array includes Enumerable module, so all Enumerable methods are applicable to Array objects as well
     * If any method mentioned in this chapter is not found in Array docs, check under Enumerable docs
+* [ruby-doc: Enumerator](https://ruby-doc.org/core-2.5.0/Enumerator.html)
+    * Some array methods can return an Enumerator, after which Enumerator methods can be applied
+    * Enumerator also includes the Enumerable module
 
 <br>
 
@@ -440,7 +450,8 @@ Apple
 => ["apple", "mango", "guava", "orange"]
 ```
 
-* if index is needed
+* if index is needed, use `each_index` method
+* if both value and index is needed, use `each_with_index` Enumerable method
 
 ```ruby
 >> books = %w[Elantris Martian Dune Alchemist]
@@ -506,6 +517,8 @@ Apple
 >> books
 => ["Harry Potter", "Martian", nil, nil, "Alchemist"]
 
+# no. of elements is equal to no. of indices in below example
+# but they can differ if needed
 >> books[2..3] = %w[Dune Elantris]
 => ["Dune", "Elantris"]
 >> books
@@ -710,6 +723,8 @@ Apple
 ```
 
 * get first element or all elements/indices based on a condition
+* the `nums.each_index` example below returns an Enumerator (because a block wasn't supplied)
+    * Enumerator/Enumerable methods can then be used as needed
 
 ```ruby
 >> nums = [1, 5, 2, 1, 3, 1, 2]
@@ -736,6 +751,7 @@ Apple
 ```
 
 * use `partition` to get both matching and non-matching elements
+    * this is yet another example of using Enumerable method on an array object
 
 ```ruby
 >> nums = [1, 5, 2, 1, 3, 1, 2]
@@ -793,7 +809,7 @@ ArgumentError (comparison of Integer with String failed)
 => [0, 1, 1, 2, 5.3, 321]
 ```
 
-* before we continue on more sorting stuff, let's see the `<=>` operator
+* before we continue on more sorting stuff, let's see the `<=>` spaceship operator
 * it gives `1` if LHS is greater than RHS, `-1` if lesser than RHS and `0` if equal to RHS
 
 ```ruby
@@ -942,7 +958,7 @@ ArgumentError (comparison of Integer with String failed)
 => ["crusado", "fuliginous"]
 ```
 
-* to get both min and max values in one shot
+* get both min and max values in one shot by using Enumerable methods
 
 ```ruby
 >> nums = [431, 4, 5, -2, 51, 3, 6, -22]
