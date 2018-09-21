@@ -449,6 +449,27 @@ FrozenError (can't modify frozen String)
 
 ## <a name="miscellaneous"></a>Miscellaneous
 
+* use Enumerable methods `sort` and `sort_by` for sorting needs
+* the output is an array of arrays, so convert back to hash when needed
+
+```ruby
+>> marks = {"foo" => 90, "baz" => 80, "lo" => 73, "kek" => 62}
+=> {"foo"=>90, "baz"=>80, "lo"=>73, "kek"=>62}
+
+# by default, keys get sorted in ascending order
+>> marks.sort
+=> [["baz", 80], ["foo", 90], ["kek", 62], ["lo", 73]]
+# block form example
+>> marks.sort { |a, b| b[0] <=> a[0] }.to_h
+=> {"lo"=>73, "kek"=>62, "foo"=>90, "baz"=>80}
+>> marks.sort { |a, b| a[1] <=> b[1] }.to_h
+=> {"kek"=>62, "lo"=>73, "baz"=>80, "foo"=>90}
+
+# sort_by example
+>> marks.sort_by { |k, v| -v }.to_h
+=> {"foo"=>90, "baz"=>80, "lo"=>73, "kek"=>62}
+```
+
 * `flatten` method will convert hash to array with each key-value pair forming two elements
     * optional argument allows to specify depth of flattening
 * `compact` method will remove all keys with `nil` value
