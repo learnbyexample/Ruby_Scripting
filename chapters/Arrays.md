@@ -767,6 +767,32 @@ Apple
 => [1, 2, 1, 1, 2]
 ```
 
+* use Enumerable methods `grep` and `grep_v` to filter elements based on `===` operator
+    * the `===` operator helps to check if an object will satisfy as a member of given condition
+    * if a block is passed, the given action is performed upon all the filtered elements, similar to `map` method that we'll see later on
+* See [stackoverflow: What does the "===" operator do in Ruby?](https://stackoverflow.com/questions/4467538/what-does-the-operator-do-in-ruby) for more details
+
+```ruby
+>> arr = [5, 3.14, 'hello', [2, 4], 42, 'bye', -0.3]
+=> [5, 3.14, "hello", [2, 4], 42, "bye", -0.3]
+
+>> arr.grep(Integer)
+=> [5, 42]
+>> arr.grep(String)
+=> ["hello", "bye"]
+>> arr.grep(3..100)
+=> [5, 3.14, 42]
+
+# inverse selection, similar to cli 'grep -v' command
+>> arr.grep_v(Float)
+=> [5, "hello", [2, 4], 42, "bye"]
+>> arr.grep_v(Numeric)
+=> ["hello", [2, 4], "bye"]
+
+>> arr.grep(Integer) { |n| n**2 }
+=> [25, 1764]
+```
+
 * random element(s)
 
 ```ruby
@@ -1086,6 +1112,7 @@ ArgumentError (comparison of Integer with String failed)
 * `any?` returns `true` if at least one condition is `true`
 * `none?` returns `true` if all conditions are `false`
 * `one?` returns `true` if exactly one condition is `true`
+* these Enumerable methods use the `===` operator when an argument is passed instead of block
 
 ```ruby
 >> nums = [4, 2, 51]
