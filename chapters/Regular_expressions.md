@@ -139,8 +139,8 @@ hi
 => false
 ```
 
-* the `===` operator returns `true` or `false` similar to `match?` method, but this will set global variables
-* this is more useful when using `grep/grep_v` Enumerable method to filter elements based on regexp
+* the `===` operator returns `true` or `false` similar to `match?` method, but in addition this will set global variables
+* this is more useful when using Enumerable methods like `grep/grep_v/all?/any?/etc` as they use the `===` operator
 
 ```ruby
 >> sentence = 'This is a sample string'
@@ -149,6 +149,13 @@ hi
 >> /is/ === sentence
 => true
 >> /z/ === sentence
+=> false
+
+>> words = %w[cat parrot whale]
+=> ["cat", "parrot", "whale"]
+>> words.all?(/a/)
+=> true
+>> words.all?(/t/)
 => false
 ```
 
@@ -1791,6 +1798,7 @@ See the below image for illustration (courtesy [regexper](https://regexper.com/)
 ```
 
 * using `\g` replaces the value backreferenced by the capturing group with the new value that is matched with `\g`
+    * similar to quantifier on capture group giving only the last match
 
 ```ruby
 >> d = '2008-03-24,2012-08-12 2017-06-27,2018-03-25 1999-12-23,2001-05-08'
