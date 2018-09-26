@@ -4,7 +4,13 @@
 
 * [Modes and Encoding](#modes-and-encoding)
 * [Reading files](#reading-files)
-    * [line by line](#line-by-line)
+    * [Line by line](#line-by-line)
+    * [Processing entire file](#processing-entire-file)
+* [Writing files](#writing-files)
+
+<br>
+
+The text and code files referenced in this chapter can be obtained from [Ruby_Scripting: programs](https://github.com/learnbyexample/Ruby_Scripting/tree/master/programs) directory
 
 <br>
 
@@ -25,7 +31,7 @@
 
 >> 'hello'.encoding
 => #<Encoding:UTF-8>
->> 'hello'.force_encoding('ASCII').encoding
+>> 'hello'.force_encoding('US-ASCII').encoding
 => #<Encoding:US-ASCII>
 ```
 
@@ -46,7 +52,7 @@ In this chapter, we'll be using `File` which is a subclass of `IO` class. `IO` i
 
 ## <a name="reading-files"></a>Reading files
 
-#### <a name="line-by-line"></a>line by line
+#### <a name="line-by-line"></a>Line by line
 
 ```ruby
 #!/usr/bin/env ruby
@@ -58,12 +64,14 @@ File.open(filename) do |f|
 end
 ```
 
-* Here, the entire file processing is within the block passed to `File.open`
+* here, the entire file processing is within the block passed to `File.open`
 * `f` is the name of file handle and gets automatically closed after the block is done
 * the `each` method allows us to process the file line by line as defined by record separator `$/` (default is newline character)
     * we can also pass custom record separator as an argument, see `each_line` method in [String methods](./String_methods.md#looping) chapter for details
     * this method will get lines from the file one at a time, so input file size won't affect memory requirements
 * we haven't specified mode/encoding while opening - default is read text mode and global encoding settings
+    * See [ruby-doc: IO encoding](https://ruby-doc.org/core-2.5.0/Encoding.html#class-Encoding-label-IO+encoding+example) for examples
+* if the given filename doesn't exist or if the read fails for some reason, you'd get an exception indicating the issue
 
 ```
 $ ./file_read_line_by_line.rb
@@ -116,4 +124,82 @@ How are you
 >> File.foreach('greeting.txt', sep='').grep(/ell|it/)
 => ["Hello World\n\n", "Just do-it\nBelieve it\n"]
 ```
+
+<br>
+
+#### <a name="processing-entire-file"></a>Processing entire file
+
+* reading entire file as a string or as an array
+* suitable for small enough files which fit memory requirements
+
+```ruby
+>> s = File.read('greeting.txt')
+=> "Hello World\n\nGood day\nHow are you\n\nJust do-it\nBelieve it\n"
+
+>> s = File.readlines('hello.txt')
+=> ["hello\n", "Χαίρετε\n"]
+```
+
+* applying string/enumerable methods
+
+```ruby
+# no. of words
+>> File.read('greeting.txt').split.size
+=> 11
+
+# common lines
+>> File.readlines('colors_1.txt') & File.readlines('colors_2.txt')
+=> ["Blue\n", "Red\n"]
+
+# lines from colors_1.txt not present in colors_2.txt
+>> File.readlines('colors_1.txt') - File.readlines('colors_2.txt')
+=> ["Brown\n", "Purple\n", "Teal\n", "Yellow\n"]
+```
+
+<br>
+
+## <a name="writing-files"></a>Writing files
+
+* specify mode as `w` when opening the file for writing
+    * file will be overwritten if it already exists, otherwise a new file will be created for writing
+* use `write` method on filehandle to add text to the file
+    * if the arguments are not string, `to_s` method will be applied to convert into string before getting written
+    * return value is total number of bytes written
+
+```ruby
+# external encoding changed to US-ASCII instead of default UTF-8
+>> File.open('new_file.txt', 'w:US-ASCII') do |f|
+?>   f.write("This is a sample line of text\n")
+>>   f.write("Yet another line\n")
+>> end
+```
+
+* sanity check
+
+```
+$ file new_file.txt
+new_file.txt: ASCII text
+
+$ cat new_file.txt
+This is a sample line of text
+Yet another line
+```
+
+* use `a` instead of `w` to open file for appending
+
+```
+$ irb --simple-prompt
+>> File.open('new_file.txt', 'a:US-ASCII') do |f|
+?>   f.write("Appending a line at end of file\n")
+>> end
+=> 32
+>> exit
+
+$ cat new_file.txt
+This is a sample line of text
+Yet another line
+Appending a line at end of file
+```
+
+
 
