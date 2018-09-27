@@ -7,6 +7,7 @@
     * [Line by line](#line-by-line)
     * [Processing entire file](#processing-entire-file)
 * [Writing files](#writing-files)
+* [Interacting with File System](#interacting-with-file-system)
 
 <br>
 
@@ -42,10 +43,11 @@ The text and code files referenced in this chapter can be obtained from [Ruby_Sc
 
 **Further Reading**
 
-In this chapter, we'll be using `File` which is a subclass of `IO` class. `IO` includes the Enumerable module
+In this chapter, we'll be using `File` and `Dir` classes. `IO` includes the Enumerable module and `File` is a subclass of `IO`
 
 * [ruby-doc: IO](https://ruby-doc.org/core-2.5.0/IO.html)
 * [ruby-doc: File](https://ruby-doc.org/core-2.5.0/File.html)
+* [ruby-doc: Dir](https://ruby-doc.org/core-2.5.0/Dir.html)
 * [ruby-doc: Encoding](https://ruby-doc.org/core-2.5.0/Encoding.html)
 
 <br>
@@ -65,7 +67,7 @@ end
 ```
 
 * here, the entire file processing is within the block passed to `File.open`
-* `f` is the name of file handle and gets automatically closed after the block is done
+* `f` is the name of filehandle and gets automatically closed after the block is done
 * the `each` method allows us to process the file line by line as defined by record separator `$/` (default is newline character)
     * we can also pass custom record separator as an argument, see `each_line` method in [String methods](./String_methods.md#looping) chapter for details
     * this method will get lines from the file one at a time, so input file size won't affect memory requirements
@@ -85,7 +87,7 @@ Just do-it
 Believe it
 ```
 
-* having a file handle, like the previous example, allows flexibility to use various File methods as needed
+* having a filehandle, like the previous example, allows flexibility to use various File methods as needed
 * for example, using `readline` to skip some lines and then using `each` to process rest of the lines
     * note that `readline` will require exception handling if end of file (EOF) was already reached
     * you can use `gets` instead if you don't want the exception to be raised
@@ -103,7 +105,7 @@ Believe it
 => #<File:greeting.txt (closed)>
 ```
 
-* if all you need is only the `each` method, you could use `File.foreach` instead of using a file handle
+* if all you need is only the `each` method, you could use `File.foreach` instead of using a filehandle
     * arguments like record separator is specified after the file name argument
     * `foreach` won't be suitable if you need other `File.open` arguments like mode/encoding/etc
 
@@ -186,6 +188,7 @@ Yet another line
 ```
 
 * use `a` instead of `w` to open file for appending
+    * a new file will be created for writing if it doesn't exist
 
 ```
 $ irb --simple-prompt
@@ -201,5 +204,150 @@ Yet another line
 Appending a line at end of file
 ```
 
+* you can also use `puts` on filehandle instead of `write` method
+
+```
+$ irb --simple-prompt
+>> File.open('filtered_greeting.txt', 'w') do |f|
+?>   f.puts File.foreach('greeting.txt', sep='').grep(/ell|it/)
+>> end
+=> nil
+>> exit
+
+$ cat filtered_greeting.txt
+Hello World
+
+Just do-it
+Believe it
+```
+
+<br>
+
+## <a name="interacting-with-file-system"></a>Interacting with File System
+
+* `File` and `Dir` classes provide ways to work with file system
+* Many of the methods emulate behavior of common unix commands, for ex:
+    * `Dir.mkdir` creates directory, allows specifying permissions as well
+    * `Dir.rmdir` to remove empty directory
+    * `Dir.chdir` to change current working directory
+    * `Dir.children` to list contents of given directory
+
+```ruby
+# current working directory
+>> Dir.pwd
+=> "/home/learnbyexample/Ruby_Scripting"
+
+# home directory, optionally accepts username as an argument
+>> Dir.home
+=> "/home/learnbyexample"
+```
+
+* to determine if file/directory exists before processing them
+
+```ruby
+# check if given path exists
+>> File.exist?('greeting.txt')
+=> true
+>> File.exist?('/home/learnbyexample')
+=> true
+
+# check if given path is a file
+>> File.file?('greeting.txt')
+=> true
+>> File.file?('/home/learnbyexample')
+=> false
+
+# check if given path is a directory
+>> Dir.exist?('greeting.txt')
+=> false
+>> Dir.exist?('/home/learnbyexample')
+=> true
+```
+
+Consider the following directory structure:
+
+```
+$ tree -a
+.
+├── backups
+│   ├── bookmarks_2018-09-25.html
+│   └── dot_files
+│       ├── .bashrc
+│       ├── .inputrc
+│       └── .vimrc
+├── ch.sh
+├── scripts
+│   ├── hello_world.rb
+│   ├── ip.txt
+│   ├── palindrome.rb
+│   ├── power.log
+│   └── report.log
+└── todo
+
+3 directories, 11 files
+```
+
+* getting list of files and iterating over it for a given directory
+
+```ruby
+>> Dir.children('.')
+=> ["ch.sh", "backups", "scripts", "todo"]
+>> Dir.children('backups')
+=> ["bookmarks_2018-09-25.html", "dot_files"]
+
+>> Dir.entries('.')
+=> ["ch.sh", "backups", "scripts", ".", "..", "todo"]
+
+# use 'foreach' to include '.' and '..' entries as well
+>> Dir.each_child('scripts') { |f| puts f }
+report.log
+ip.txt
+power.log
+hello_world.rb
+palindrome.rb
+```
+
+* `Dir.glob` allows unix shell like wildcards
+* helpful to filter based on filename and iterating recursively
+
+```ruby
+# can also use: Dir['**/*.rb']
+>> Dir.glob('**/*.rb')
+=> ["scripts/hello_world.rb", "scripts/palindrome.rb"]
+# matching multiple extensions, don't use space after ,
+>> Dir.glob('**/*.{log,sh}')
+=> ["scripts/report.log", "scripts/power.log", "ch.sh"]
+>> Dir.glob('[a-c]*')
+=> ["ch.sh", "backups"]
+
+>> Dir.glob('**/*') { |f| puts f if File.file?(f) }
+ch.sh
+backups/bookmarks_2018-09-25.html
+scripts/report.log
+scripts/ip.txt
+scripts/power.log
+scripts/hello_world.rb
+scripts/palindrome.rb
+todo
+```
+
+* let's see some more examples for `File` methods
+
+```ruby
+>> File.executable?('scripts/hello_world.rb')
+=> true
+>> File.executable?('scripts/report.log')
+=> false
+
+>> File.size('scripts/report.log')
+=> 39120
+
+>> File.absolute_path('ch.sh')
+=> "/home/learnbyexample/misc/ch.sh"
+
+# joins the given strings with / if not present
+>> File.join('foo', 'baz/', 'a.txt')
+=> "foo/baz/a.txt"
+```
 
 
