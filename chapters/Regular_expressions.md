@@ -43,16 +43,17 @@
 ## <a name="why-is-it-needed"></a>Why is it needed?
 
 * useful for text processing defined by *regular* structure, for ex:
-    * replace something only at start/end of string
-    * extract portions defined by set of characters - for ex: words, integers, floats, hex, etc
-    * replace something only if it matches a surrounding condition
-    * validate string format
+    * sanitizing a string to ensure it satisfies a known set of rules
+    * filtering or extracting portions on an abstract level like alphabets, numbers, punctuations, etc instead of a known fixed string
+    * specify a condition for replacing a string with another - for ex: start or end of string, whole words, surrounding text, etc
 * modern regular expressions implemented in high level languages support non-regular features like recursion too, so usage of the term is different than the mathematical concept
 
 **Further Reading**
 
+* [The true power of regular expressions](https://nikic.github.io/2012/06/15/The-true-power-of-regular-expressions.html) - it also includes a nice explanation of what 'regular' means
 * [softwareengineering.stackexchange: Is it a must for every programmer to learn regular expressions?](https://softwareengineering.stackexchange.com/questions/133968/is-it-a-must-for-every-programmer-to-learn-regular-expressions)
 * [softwareengineering.stackexchange: When you should NOT use Regular Expressions?](https://softwareengineering.stackexchange.com/questions/113237/when-you-should-not-use-regular-expressions)
+* [Regular Expressions: Now You Have Two Problems](https://blog.codinghorror.com/regular-expressions-now-you-have-two-problems/)
 * [wikipedia: Regular expression](https://en.wikipedia.org/wiki/Regular_expression) for discussion as a formal language as well as various implementations
 
 <br>
@@ -97,8 +98,7 @@ Quoting from [ruby-doc: Regexp](https://ruby-doc.org/core-2.5.0/Regexp.html)
 >> 'hello'.match?(r)
 => false
 
->> ip = gets.chomp
-hi
+>> ip = 'hi'
 => "hi"
 >> r = /t#{ip}s/
 => /this/
@@ -155,7 +155,7 @@ hi
 => ["cat", "parrot", "whale"]
 >> words.all?(/a/)
 => true
->> words.all?(/t/)
+>> words.none?(/w/)
 => false
 ```
 
@@ -318,16 +318,17 @@ a baz
 
 ```ruby
 # same result for both \z and \Z
->> "spare\npar\ndare".sub(/are\z/, 'ABC')
-=> "spare\npar\ndABC"
->> "spare\npar\ndare".sub(/are\Z/, 'ABC')
-=> "spare\npar\ndABC"
+# as there is no newline character at end of string
+>> 'dare'.sub(/are\z/, 'X')
+=> "dX"
+>> 'dare'.sub(/are\Z/, 'X')
+=> "dX"
 
-# different results as there is a \n at end
->> "spare\npar\ndare\n".sub(/are\z/, 'ABC')
-=> "spare\npar\ndare\n"
->> "spare\npar\ndare\n".sub(/are\Z/, 'ABC')
-=> "spare\npar\ndABC\n"
+# different results as there is newline character at end of string
+>> "dare\n".sub(/are\z/, 'X')
+=> "dare\n"
+>> "dare\n".sub(/are\Z/, 'X')
+=> "dX\n"
 ```
 
 <br>
@@ -357,13 +358,12 @@ a baz
 >> s.gsub(/\bpar\b/, 'X')
 => "X spar apparent spare part"
 
-# add something at word boundaries
->> s.gsub(/\b/, ':')
-=> ":par: :spar: :apparent: :spare: :part:"
->> puts s.gsub(/\b/, "'").gsub(/ /, ',')
-'par','spar','apparent','spare','part'
->> puts 'foo_12a:_:3b'.gsub(/\b/, "'")
-'foo_12a':'_':'3b'
+# space separated words to double quoted csv
+>> puts s.gsub(/\b/, '"').tr(' ', ',')
+"par","spar","apparent","spare","part"
+
+>> '-----hello-----'.gsub(/\b/, ' ')
+=> "----- hello -----"
 ```
 
 * `\B` is opposite of `\b`, it matches non-word boundaries
@@ -386,8 +386,8 @@ a baz
 => "par spar apXent sXe part"
 
 # add something at non-word boundaries
->> puts 'foo_1 3b'.gsub(/\B/, ':')
-f:o:o:_:1 3:b
+>> 'copper'.gsub(/\B/, ':')
+=> "c:o:p:p:e:r"
 ```
 
 <br>
