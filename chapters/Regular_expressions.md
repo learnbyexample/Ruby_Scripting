@@ -36,7 +36,8 @@
 <br>
 
 * Examples in this chapter will deal with *ASCII* characters only unless otherwise specified
-* Some features are not documented on [ruby-doc: Regexp](https://ruby-doc.org/core-2.5.0/Regexp.html), see [Onigmo regular expressions library](https://github.com/k-takata/Onigmo/blob/master/doc/RE) for such cases
+* Ruby Regexp is based on [Onigmo regular expressions library](https://github.com/k-takata/Onigmo/blob/master/doc/RE)
+* An edited and expanded version of this chapter is available as [free e-book on leanpub](https://leanpub.com/rubyregexp)
 
 <br>
 
@@ -521,8 +522,8 @@ a baz
 >> 'a || b'.gsub(/\|/, '&')
 => "a && b"
 
->> '\foo\bar\baz'.gsub(/\\/, '/')
-=> "/foo/bar/baz"
+>> '\learn\by\example'.gsub(/\\/, '/')
+=> "/learn/by/example"
 ```
 
 * use `Regexp.escape` to let Ruby handle escaping all the metacharacters present in a string
@@ -551,6 +552,7 @@ a baz
 ```
 
 * use `%r` percent string to use any other delimiter than the default `/`
+* Note: no need to worry about unescaped delimiter inside `#{}` interpolation
 
 ```ruby
 >> '/foo/bar/baz/123'.match?('o/bar/baz/1')
@@ -605,8 +607,8 @@ a baz
 => "X spare X party"
 
 # same as: /\b(re.d|red)\b/
->> 'red read ready re;d redo reed'.gsub(/\bre.?d\b/, 'X')
-=> "X X ready X redo X"
+>> %w[red read ready re;d redo reed].grep(/\bre.?d\b/)
+=> ["red", "read", "re;d", "reed"]
 
 # same as: /part|parrot/
 >> 'par part parrot parent'.gsub(/par(ro)?t/, 'X')
@@ -775,6 +777,18 @@ blah \< foo \< bar \< blah \< baz
 => "feat ft feaeat"
 ```
 
+* possessive quantifier can also be expressed using **atomic grouping** with `(?>` special group
+
+```ruby
+# same as: /(b|o)++/
+>> 'abbbc foooooot'.gsub(/(?>(b|o)+)/, 'X')
+=> "aXc fXt"
+
+# same as: /f(a|e)*+at/
+>> 'feat ft feaeat'.gsub(/f(?>(a|e)*)at/, 'X')
+=> "feat ft feaeat"
+```
+
 <br>
 
 ## <a name="match-scan-and-globals"></a>match, scan and globals
@@ -815,6 +829,12 @@ blah \< foo \< bar \< blah \< baz
 
 >> s[/ab{2,}c/]
 => "abbbc"
+
+# same as: s.sub!(/b.*b/, 'X')
+>> s[/b.*b/] = 'X'
+=> "X"
+>> s
+=> "aXc"
 ```
 
 * `scan` method returns all the matched strings as an array
@@ -842,7 +862,7 @@ ABBBC
 * global variables hold information related to matched data
     * as noted before, `match?` method won't affect these variables
 * `$~` contains `MatchData`
-* <code>$`</code> contains string before the matched string
+* ``$` `` contains string before the matched string
 * `$&` contains matched string
 * `$'` contains string after the matched string
 
@@ -948,9 +968,9 @@ ABBBC
 * quantifiers can be applied to characters class as well
 
 ```ruby
-# same as: /c(o|u)t/
->> 'cut cat cot coat'.gsub(/c[ou]t/, 'X')
-=> "X cat X coat"
+# same as: /cot|cut/ or /c(o|u)t/
+>> %w[cute cat cot coat cost scuttle].grep(/c[ou]t/)
+=> ["cute", "cot", "scuttle"]
 
 # same as: /(a|o)+t/
 >> 'oat ft boa foot'.gsub(/[ao]+t/, 'X')
@@ -1125,6 +1145,9 @@ ba\bab
 # remove all punctuation characters
 >> 'hi there! how are you?? all fine here.'.gsub(/[[:punct:]]+/, '')
 => "hi there how are you all fine here"
+# remove all punctuation characters except . and !
+>> 'hi there! how are you?? all fine here.'.gsub(/[[^.!]&&[:punct:]]+/, '')
+=> "hi there! how are you all fine here."
 ```
 
 <br>
@@ -1135,7 +1158,8 @@ ba\bab
 * the string value that is matched by such groups can be referred outside the regexp using global variables `$1`, `$2`, etc
 * they can be referred within the regexp itself using backreferences as `\1`, `\2`, etc
     * `\1`, `\2` upto `\9` can be used in replacement sections of `sub/gsub` when block form is not needed
-    * `\0` would refer to entire matched string, equivalent to `$&`
+    * `\0` or `\&` would refer to entire matched string, equivalent to `$&`
+    * ``\` `` and `\'` are equivalents for ``$` `` and `$'` respectively
 * *Note* that the matched string is referenced, not the regexp itself
     * for ex: if `([0-9][a-f])` matches `3b`, then backreferencing will be `3b` not any other valid match of the regular expression like `8f`, `0a` etc
 
@@ -1218,8 +1242,8 @@ ba\bab
 >> '1,2,3,4,5,6,7'.sub(/^((?:[^,]+,){3})([^,]+)/, '\1(\2)')
 => "1,2,3,(4),5,6,7"
 
->> 'foo:-:abc34baz25tar:-:par'.split(/(?:\d+|:-:)/)
-=> ["foo", "abc", "baz", "tar", "par"]
+>> '123hand42handy777handful500'.split(/hand(?:y|ful)?/)
+=> ["123", "42", "777", "500"]
 ```
 
 * but if regexp itself needs backreference, capture group cannot be avoided
@@ -1306,8 +1330,8 @@ ba\bab
 => ":cat --boat ;X"
 
 # change 'foo' only if it is not followed by a digit character
->> 'foo _food 1foo32 foot5'.gsub(/foo(?!\d)/, 'baz')
-=> "baz _bazd 1foo32 bazt5"
+>> 'hey food! foo42 foot5 foofoo'.gsub(/foo(?!\d)/, 'baz')
+=> "hey bazd! foo42 bazt5 bazbaz"
 
 # words not surrounded by punctuation marks
 >> ':cat top nice; cool. mad'.scan(/(?<![[:punct:]])\b\w+\b(?![[:punct:]])/)
@@ -1338,6 +1362,22 @@ ba\bab
 # same as: gsub(/(?<![^,])(?![^,])/, 'NA')
 >> ',,1,,,2,,3,,'.gsub(/(?<=\A|,)(?=,|\z)/, 'NA')
 => "NA,NA,1,NA,NA,2,NA,3,NA,NA"
+```
+
+* lookarounds can be used to construct AND conditional
+
+```ruby
+>> words = %w[sequoia subtle questionable exhibit equation]
+=> ["sequoia", "subtle", "questionable", "exhibit", "equation"]
+
+# words containing 'b' and 'e' and 't' in any order
+# same as: /b.*e.*t|b.*t.*e|e.*b.*t|e.*t.*b|t.*b.*e|t.*e.*b/
+>> words.grep(/(?=.*b)(?=.*e).*t/)
+=> ["subtle", "questionable", "exhibit"]
+
+# words containing all vowels in any order
+>> words.grep(/(?=.*a)(?=.*e)(?=.*i)(?=.*o).*u/)
+=> ["sequoia", "questionable", "equation"]
 ```
 
 * even though lookarounds are not part of matched string, capture groups can be used inside them
@@ -1505,13 +1545,13 @@ SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
 * See also [ruby-doc: Encoding](https://ruby-doc.org/core-2.5.0/Encoding.html) for details on handling different string encodings
 
 ```ruby
->> s = 'foo - baz'
->> s.gsub(/\w+/n, '(\0)')
+# example with ASCII characters only
+>> 'foo - baz'.gsub(/\w+/n, '(\0)')
 => "(foo) - (baz)"
 
->> s = 'foo — baz'
->> s.gsub(/\w+/n, '(\0)')
-(irb):4: warning: historical binary regexp match /.../n against UTF-8 string
+# example with non-ASCII characters as well
+>> 'foo — baz'.gsub(/\w+/n, '(\0)')
+(irb):2: warning: historical binary regexp match /.../n against UTF-8 string
 => "(foo) — (baz)"
 ```
 
@@ -1535,10 +1575,10 @@ SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
 >> 'Cat SCatTeR CATER cAts'.scan(/Cat(?i)[a-z]*\b/)
 => ["Cat", "CatTeR"]
 
->> Regexp.union(/foo/i, 'bar')
-=> /(?i-mx:foo)|bar/
->> Regexp.union(/foo/, 'a^b', /c.t\b/im)
-=> /(?-mix:foo)|a\^b|(?mi-x:c.t\b)/
+>> Regexp.union(/^cat/i, '123')
+=> /(?i-mx:^cat)|123/
+>> Regexp.union(/cat/, 'a^b', /the.*ice/im)
+=> /(?-mix:cat)|a\^b|(?mi-x:the.*ice)/
 ```
 
 <br>
@@ -1565,14 +1605,20 @@ SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
 => "φοοβτfoo"
 ```
 
-* for character class ranges, use codepoints defined by `\u{}`
+* for generic Unicode character ranges, specify codepoints using `\u{}` construct.
 
 ```ruby
->> 'hi 😆😇'.codepoints.map { |i| '%x' % i }
-=> ["68", "69", "20", "1f606", "1f607"]
+# to get codepoints from string
+>> 'fox:αλεπού'.codepoints.map { |i| '%x' % i }
+=> ["66", "6f", "78", "3a", "3b1", "3bb", "3b5", "3c0", "3bf", "3cd"]
+# one or more codepoints can be specified inside \u{}
+>> puts "\u{66 6f 78 3a 3b1 3bb 3b5 3c0 3bf 3cd}"
+fox:αλεπού
 
->> puts "\u{68}\u{69}\u{20}\u{1f606}\u{1f607}"
-hi 😆😇
+# character range example using \u{}
+# all english lowercase letters
+>> 'fox:αλεπού,eagle:αετός'.scan(/[\u{61}-\u{7a}]+/)
+=> ["fox", "eagle"]
 ```
 
 **Further Reading**
@@ -1733,11 +1779,11 @@ See the below image for illustration (courtesy [regexper](https://regexper.com/)
 >> puts "#{s} apples" if s.sub!(/\d+/) { $&.to_i ** 2 }
 16 apples
 
->> s, c = ['coffining', 0]
+>> word, cnt = ['coffining', 0]
 => ["coffining", 0]
->> c += 1 while s.sub!(/.in/, '')
+>> cnt += 1 while word.sub!(/fin/, '')
 => nil
->> [s, c]
+>> [word, cnt]
 => ["cog", 2]
 
 >> s = '421,foo,2425,42,5,foo,6,6,42'
@@ -1822,10 +1868,14 @@ See the below image for illustration (courtesy [regexper](https://regexper.com/)
 
 Note that most of these resources are not specific to Ruby, so use them with caution and check if they apply to Ruby's syntax and features
 
+* An edited and expanded version of this chapter is available as [free e-book on leanpub](https://leanpub.com/rubyregexp)
 * [rubular](http://rubular.com/) - Ruby regular expression editor
 * [stackoverflow: ruby regexp](https://stackoverflow.com/questions/tagged/ruby+regex?sort=votes&pageSize=15)
+* [regexp-examples](https://github.com/tom-lord/regexp-examples) - Generate strings that match a given Ruby regular expression
 * [stackoverflow: regex FAQ](https://stackoverflow.com/questions/22937618/reference-what-does-this-regex-mean)
+    * [stackoverflow: regex tag](https://stackoverflow.com/questions/tagged/regex) is a good source of exercise questions
 * [rexegg](https://www.rexegg.com/) - comprehensive regular expression tutorials, tricks and more
+* [regular-expressions](https://www.regular-expressions.info/) - tutorials and tools
 * [regexcrossword](https://regexcrossword.com/) - tutorials and puzzles
 * [regexper](https://regexper.com/) - for visualization
 * [swtch](https://swtch.com/~rsc/regexp/regexp1.html) - stuff about regular expression implementation engines
