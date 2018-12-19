@@ -1550,9 +1550,9 @@ SyntaxError ((irb):4: invalid pattern in look-behind: /(?<!baz.*)123/)
 => "(foo) - (baz)"
 
 # example with non-ASCII characters as well
->> 'foo — baz'.gsub(/\w+/n, '(\0)')
+>> 'fox:αλεπού'.scan(/\w+/n)
 (irb):2: warning: historical binary regexp match /.../n against UTF-8 string
-=> "(foo) — (baz)"
+=> ["fox"]
 ```
 
 * the modifiers can also be applied to specific portion of regexp instead of entire pattern, for ex:
@@ -1646,13 +1646,13 @@ fox:αλεπού
 => "9two3four0onetwo"
 
 # swap words
->> h = { 'cat' => 'tiger', 'tiger' => 'cat' }
+>> swap = { 'cat' => 'tiger', 'tiger' => 'cat' }
 => {"cat"=>"tiger", "tiger"=>"cat"}
-# without worrying what was defined in hash
->> 'cat tiger dog tiger cat'.gsub(/\w+/) { h.key?($&) ? h[$&] : $& }
+# replace word if it exists as key, else leave it as is
+>> 'cat tiger dog tiger cat'.gsub(/\w+/) { swap[$&] || $& }
 => "tiger cat dog cat tiger"
-# or build the regexp for simple cases
->> 'cat tiger dog tiger cat'.gsub(/cat|tiger/, h)
+# or, build the alternation regexp manually for simple cases
+>> 'cat tiger dog tiger cat'.gsub(/cat|tiger/, swap)
 => "tiger cat dog cat tiger"
 ```
 
@@ -1743,28 +1743,24 @@ fox:αλεπού
 => ["((r-2)*(t+2)/6)"]
 ```
 
-The two-level matching regexp is built by specifying the one-level regexp as part of an alternation. See the below image for illustration (courtesy [regexper](https://regexper.com/))
+The two-level matching regexp is built by specifying the one-level regexp as part of an alternation. See the below image for illustration (courtesy [regexper](https://regexper.com/#%5C%28%28%3F%3A%5B%5E%28%29%5D%2B%7C%5C%28%5B%5E%28%29%5D%2B%5C%29%29%2B%5C%29))
 
 ![two-level parentheses matching regexp](../images/two_level.png)
 
-* by using capture group and `\g` as part of alternation inside the same capture group that is referenced by `\g`, we get recursive matching
+* by using `\g<0>` (i.e. calling the entire regexp) instead of one-level regexp in the alternation portion, we get recursive matching
 
 ```ruby
->> '3 * ((r-2)*(t+2)/6)'.gsub(/\(((?:[^()]++|\(\g<1>\))++)\)/).to_a
+>> '3 * ((r-2)*(t+2)/6)'.scan(/\((?:[^()]++|\g<0>)++\)/)
 => ["((r-2)*(t+2)/6)"]
 
->> '(3+a) * ((r-2)*(t+2)/6)'.gsub(/\(((?:[^()]++|\(\g<1>\))++)\)/).to_a
+>> '(3+a) * ((r-2)*(t+2)/6)'.scan(/\((?:[^()]++|\g<0>)++\)/)
 => ["(3+a)", "((r-2)*(t+2)/6)"]
 
 >> s = '(3+a) * ((r-2)*(t+2)/6) + 42 * (a(b(c(d(e)))))'
 => "(3+a) * ((r-2)*(t+2)/6) + 42 * (a(b(c(d(e)))))"
->> s.gsub(/\(((?:[^()]++|\(\g<1>\))++)\)/).to_a
+>> s.scan(/\((?:[^()]++|\g<0>)++\)/)
 => ["(3+a)", "((r-2)*(t+2)/6)", "(a(b(c(d(e)))))"]
 ```
-
-See the below image for illustration (courtesy [regexper](https://regexper.com/))
-
-![nested parentheses matching regexp](../images/generic_nested.png)
 
 <br>
 
