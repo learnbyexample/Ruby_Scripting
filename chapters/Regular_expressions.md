@@ -38,6 +38,7 @@
 * Examples in this chapter will deal with *ASCII* characters only unless otherwise specified
 * Ruby Regexp is based on [Onigmo regular expressions library](https://github.com/k-takata/Onigmo/blob/master/doc/RE)
 * An edited and expanded version of this chapter is available as [free e-book on leanpub](https://leanpub.com/rubyregexp)
+* For practice problems, see [Ruby Regexp Exercises](https://github.com/learnbyexample/Ruby_Regexp/blob/master/exercises/Exercises.md)
 
 <br>
 
@@ -1865,6 +1866,7 @@ The two-level matching regexp is built by specifying the one-level regexp as par
 Note that most of these resources are not specific to Ruby, so use them with caution and check if they apply to Ruby's syntax and features
 
 * An edited and expanded version of this chapter is available as [free e-book on leanpub](https://leanpub.com/rubyregexp)
+* For practice problems, see [Ruby Regexp Exercises](https://github.com/learnbyexample/Ruby_Regexp/blob/master/exercises/Exercises.md)
 * [rubular](http://rubular.com/) - Ruby regular expression editor
 * [stackoverflow: ruby regexp](https://stackoverflow.com/questions/tagged/ruby+regex?sort=votes&pageSize=15)
 * [regexp-examples](https://github.com/tom-lord/regexp-examples) - Generate strings that match a given Ruby regular expression
